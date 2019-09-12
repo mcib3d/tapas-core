@@ -73,7 +73,7 @@ public class OmeroConnect {
     public OmeroConnect() {
         Logger simpleLogger = new SimpleLogger();
         gateway = new Gateway(simpleLogger);
-        //System.out.println("" + gateway);
+        System.out.println("omero connect : " + gateway);
     }
 
     public static boolean notInExcludeList(String imageName, ArrayList<String> excludeList) {
@@ -271,7 +271,7 @@ public class OmeroConnect {
         return getImageXYZ(image, t, c, 1, 1, 0, -1, 0, -1, 0, -1);
     }
 
-    public double[] getResolutionImage(ImageData imageData) throws ExecutionException, BigResult {
+    public double[] getResolutionImage(ImageData imageData) throws ExecutionException,BigResult{
         RawDataFacility rdf = gateway.getFacility(RawDataFacility.class);
         PixelsData pixels = imageData.getDefaultPixels();
         Length pixelsXY = pixels.getPixelSizeX(UnitsLength.MICROMETER);

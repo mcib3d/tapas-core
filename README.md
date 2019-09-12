@@ -32,11 +32,14 @@ and
 `</repository>`
 
   
-  If you use TAPS in your experiments, please cite : 
+  If you use TAPAS in your experiments, please cite : 
+  
   J. Ollion, J. Cochennec, F. Loll, C. Escudé, and T. Boudier (2013). 
   TANGO: a generic tool for high-throughput 3D image analysis for studying nuclear organization.
   Bioinformatics 29(14):1840-1. doi: 10.1093/bioinformatics/btt276.
+  
   and 
+  
   Whitehead et al.(2018).
   Towards an Automated Processing and Analysis System for multi-dimensional light-sheet microscopy big data using ImageJ and OMERO.
   IMC'19, Sydney, Australia.

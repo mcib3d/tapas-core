@@ -106,20 +106,15 @@ public class TAPAS_MENU extends JFrame {
 
         initText();
 
-        comboBoxPlugins.addActionListener(e -> {
-            selectPlugins();
-
-        });
-        createTextButton.addActionListener(e -> {
-            createText();
-        });
+        comboBoxPlugins.addActionListener(e -> selectPlugins());
+        createTextButton.addActionListener(e -> createText());
     }
 
     private void initText(){
         String process = "";
         process = process.concat("// first process should be input \n");
         process = process.concat("// to read image from OMERO \n");
-        process = process.concat("// or load to read from a file \n");
+        process = process.concat("// or from file \n");
         process = process.concat("process:input \n");
         textArea1.append(process);
         textArea1.append("\n");

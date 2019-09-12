@@ -5,6 +5,7 @@ import ij.WindowManager;
 import ij.plugin.frame.Recorder;
 import mcib3d.tapas.core.TapasBatchProcess;
 import mcib3d.tapas.core.OmeroConnect;
+import mcib3d.tapas.utils.JobsGenerate;
 import omero.gateway.model.DatasetData;
 import omero.gateway.model.ImageData;
 import omero.gateway.model.ProjectData;
@@ -12,6 +13,7 @@ import omero.gateway.model.ProjectData;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -29,6 +31,7 @@ public class TAPAS_OMERO extends JFrame {
     private JButton browseButton;
     private JButton runProcessingButton;
     private JTextField textFieldRoot;
+    private JCheckBox jobsCheckBox;
     //
     OmeroConnect omero;
     DefaultListModel model = new DefaultListModel();
@@ -55,6 +58,7 @@ public class TAPAS_OMERO extends JFrame {
         setMinimumSize(new Dimension(800, 600));
         setPreferredSize(new Dimension(800, 600));
         setTitle("TAPAS OMERO " + TapasBatchProcess.version);
+        jobsCheckBox.setVisible(false);// jobs is highly experimental
         pack();
         setVisible(true);
 
@@ -181,36 +185,50 @@ public class TAPAS_OMERO extends JFrame {
         String project = textFieldProject.getText();
         String dataset = textFieldDataset.getText();
         // images
-        String image;
+        String image = "";
         int[] indices = listImages.getSelectedIndices();
         if (indices.length == 1) image = textFieldImage.getText(); // by default selected image
-        else if ((indices.length == model.getSize()) || (indices.length == 0)) image = "*";
-        else {
+        if (indices.length == model.getSize()) image = "*";
+        if (indices.length == 0) {
+            String rep = IJ.getString("Process all files (y/n) ?", "n");
+            if (rep.equalsIgnoreCase("y")) image = "*";
+            else {
+                runProcessingButton.setEnabled(true);
+                return;
+            }
+        }
+        if ((indices.length > 1) && (indices.length < model.size())) {
             image = "";
             for (int i = 0; i < indices.length - 1; i++) {
                 image = image.concat(model.get(indices[i]).toString() + ",");
             }
             image = image.concat(model.get(indices[indices.length - 1]).toString());
         }
-
         String imageFinal = image;
-//        // process exclude
-//        String exclude = "";
-//        ArrayList<String> excludelist = new ArrayList<>();
-//        if (exclude.equals("-")) exclude = "";// if exclude - then empty
-//        if (!exclude.isEmpty()) {
-//            String[] excludes = exclude.split(",");
-//            excludelist = new ArrayList<>(excludes.length);
-//            for (int i = 0; i < excludes.length; i++) {
-//                excludelist.add(excludes[i].trim());
-//            }
-//        }
-//        ArrayList<String> excludeFinal = excludelist;
         String processFile = textFieldProcess.getText();
         if (!batchProcess.init(processFile, tapasFile.getAbsolutePath())) {
             IJ.log("Aborting");
             return;
         }
+
+        // TEST JOB
+        if (jobsCheckBox.isSelected()) {
+            // get image list from model and selected indices
+            IJ.log("Creating jobs");
+            ArrayList<String> imageJobs = new ArrayList<>(indices.length);
+            for (int i : indices) {
+                imageJobs.add(model.get(i).toString());
+                IJ.log("Added image " + model.get(i).toString());
+            }
+            JobsGenerate job = new JobsGenerate();
+            job.setRoot("OMERO");
+            job.setProject(project);
+            job.setDataset(dataset);
+            job.setImageList(imageJobs);
+            job.setProcessing(processFile);
+            new JobsScripts(job);
+        }
+        // TEST JOB
         // channel
         //String channel = textFieldChannel.getText();
         //int[] channels = processTextForTimeChannel(channel);
@@ -241,7 +259,7 @@ public class TAPAS_OMERO extends JFrame {
                 }
             });
         });
-        thread.start();
+        if (!jobsCheckBox.isSelected()) thread.start();
         runProcessingButton.setEnabled(true);
     }
 

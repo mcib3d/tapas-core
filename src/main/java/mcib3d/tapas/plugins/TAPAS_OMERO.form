@@ -168,6 +168,14 @@
           <text value="Processing"/>
         </properties>
       </component>
+      <component id="452d7" class="javax.swing.JCheckBox" binding="jobsCheckBox" default-binding="true">
+        <constraints>
+          <grid row="8" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Jobs"/>
+        </properties>
+      </component>
     </children>
   </grid>
 </form>

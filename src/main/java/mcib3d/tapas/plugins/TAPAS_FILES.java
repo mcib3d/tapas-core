@@ -39,17 +39,16 @@ public class TAPAS_FILES extends JFrame {
         if (!tapasFile.exists()) {
             IJ.log("No tapas found");
         }
-
         listImages.setModel(model);
         //textFieldFrame.setText("0-0");
         //textFieldChannel.setText("0-0");
-        panel1.setMinimumSize(new Dimension(800,600));
-        panel1.setPreferredSize(new Dimension(800,600));
+        panel1.setMinimumSize(new Dimension(800, 600));
+        panel1.setPreferredSize(new Dimension(800, 600));
         setContentPane(panel1);
-        setMinimumSize(new Dimension(800,600));
-        setPreferredSize(new Dimension(800,600));
+        setMinimumSize(new Dimension(800, 600));
+        setPreferredSize(new Dimension(800, 600));
         setContentPane(panel1);
-        setTitle("TAPAS FILES "+TapasBatchProcess.version);
+        setTitle("TAPAS FILES " + TapasBatchProcess.version);
         pack();
         setVisible(true);
 
@@ -74,11 +73,19 @@ public class TAPAS_FILES extends JFrame {
         String project = textFieldProject.getText();
         String dataset = textFieldDataset.getText();
         // images
-        String image;
+        String image = "";
         int[] indices = listImages.getSelectedIndices();
         if (indices.length == 1) image = textFieldImage.getText(); // by default selected image
-        else if ((indices.length == model.getSize()) || (indices.length == 0)) image = "*";
-        else {
+        if (indices.length == model.getSize()) image = "*";
+        if (indices.length == 0) {
+            String rep = IJ.getString("Process all files (y/n) ?", "n");
+            if (rep.equalsIgnoreCase("y")) image = "*";
+            else {
+                runProcessingButton.setEnabled(true);
+                return;
+            }
+        }
+        if ((indices.length > 1) && (indices.length < model.size())) {
             image = "";
             for (int i = 0; i < indices.length - 1; i++) {
                 image = image.concat(model.get(indices[i]).toString() + ",");
@@ -87,17 +94,18 @@ public class TAPAS_FILES extends JFrame {
         }
         String imageFinal = image;
         // process exclude
-        String exclude = "";
-        ArrayList<String> excludelist = new ArrayList<>();
-        if (exclude.equals("-")) exclude = "";// if exclude - then empty
-        if (!exclude.isEmpty()) {
-            String[] excludes = exclude.split(",");
-            excludelist = new ArrayList<>(excludes.length);
-            for (int i = 0; i < excludes.length; i++) {
-                excludelist.add(excludes[i].trim());
-            }
-        }
-        ArrayList<String> excludeFinal = excludelist;
+//        String exclude = "";
+//        ArrayList<String> excludelist = new ArrayList<>();
+//        if (exclude.equals("-")) exclude = "";// if exclude - then empty
+//        if (!exclude.isEmpty()) {
+//            String[] excludes = exclude.split(",");
+//            excludelist = new ArrayList<>(excludes.length);
+//            for (int i = 0; i < excludes.length; i++) {
+//                excludelist.add(excludes[i].trim());
+//            }
+//        }
+//       ArrayList<String> excludeFinal = excludelist;
+
         String processFile = textFieldProcess.getText();
         if (!batchProcess.init(processFile, tapasFile.getAbsolutePath())) {
             IJ.log("Aborting");
@@ -198,7 +206,7 @@ public class TAPAS_FILES extends JFrame {
         String dir = IJ.getDirectory("Select root folder for projects");
         textFieldRoot.setText(dir);
         rootProject = dir;
-        IJ.log("Found root project : "+rootProject);
+        IJ.log("Found root project : " + rootProject);
         // fill projects
         File folder = new File(rootProject);
         File[] listOfFiles = folder.listFiles();

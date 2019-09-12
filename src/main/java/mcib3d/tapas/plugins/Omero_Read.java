@@ -100,11 +100,11 @@ public class Omero_Read implements ij.plugin.PlugIn {
         dialog.addNumericField("BinningXY", binningXY, 0);
         dialog.addNumericField("BinningZ", binningZ, 0);
         dialog.addMessage("Channels");
-        dialog.addNumericField("Channel0", c0, 0);
-        dialog.addNumericField("Channel1", c1, 0);
+        dialog.addNumericField("First_channel", c0, 0);
+        dialog.addNumericField("Last_channel", c1, 0);
         dialog.addMessage("Frames");
-        dialog.addNumericField("Frame0", t0, 0);
-        dialog.addNumericField("Frame1", t1, 0);
+        dialog.addNumericField("First_frame", t0, 0);
+        dialog.addNumericField("Last_frame", t1, 0);
         //dialog.addCheckbox("Strict name", strict);
         dialog.showDialog();
         project = dialog.getNextString();

@@ -168,19 +168,22 @@ public class TapasBatchProcess {
         return s.replace(keyValue, value);
     }
 
-    public static String analyseKeyValue(String s, ImageData image, ImageInfo info, OmeroConnect connect, ArrayList users) throws ExecutionException, DSAccessException, DSOutOfServiceException {
-        if (!s.contains("KEY_")) return null;
-        String result = new String(s);
+    public static String analyseKeyValue(String keyS, ImageData image, ImageInfo info, OmeroConnect connect, ArrayList users) throws ExecutionException, DSAccessException, DSOutOfServiceException {
+        if (!keyS.contains("KEY_")) return null;
+        String result = new String(keyS);
         int pos0 = result.indexOf("KEY_");
         int pos1 = result.indexOf("_", pos0);
         if (pos1 < 0) return null;
         int pos2 = result.length();
         if (pos2 < 0) return null;
-        String key = s.substring(pos1 + 1, pos2);
+        String key = keyS.substring(pos1 + 1, pos2);
         // analysing key value
         String keyValue = analyseFileName(key, info);
         String value = connect.getValuePair(image, keyValue, users);
-        if (value == null) return null;
+        if (value == null) {
+            //IJ.log("No key "+keyS);
+            return null;
+        }
 
         return value;
     }
@@ -479,36 +482,6 @@ public class TapasBatchProcess {
         }
     }
 
-    public void generateJobs(String dir, String name, String exclude, int nJobs, int cpus, int mem, int mins, int hours) {
-        try {
-            if (allImages.size() < nJobs) nJobs = allImages.size();
-            int nImages = (int) Math.ceil(allImages.size() / nJobs);
-            for (int job = 0; job < nJobs; job++) {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(new File(dir + File.separator + name + "_job" + job + ".ijm")));
-                for (int i = job * nImages; i < (job + 1) * nImages; i++) {
-                    if (i >= allImages.size()) continue;
-                    ImageInfo info = allImages.get(i);
-                    String project = info.getProject();
-                    String dataset = info.getDataset();
-                    String image = info.getImage();
-                    int C = info.getC();
-                    int T = info.getT();
-                    bw.write(" run(\"TAPAS Omero\", \"project=[" + project + "] dataset=[" + dataset + "] image=[" + image + "] " +
-                            "exclude=" + exclude + " channel=" + C + " time=" + T + " processing=" + process.getAbsolutePath() + "\");\n");
-                }
-                bw.close();
-                bw = new BufferedWriter(new FileWriter(new File(dir + File.separator + name + "_job" + job + ".sh")));
-                bw.write("#!/bin/bash\n");
-                bw.write("#PBS -l nodes=1:ppn=" + cpus + ",mem=" + mem + "gb\n");
-                bw.write("#PBS -l walltime=" + IJ.pad(hours, 2) + ":" + IJ.pad(mins, 2) + ":00\n");
-                bw.write("#PBS -N IJ_" + job + "\n");
-                bw.write("home/App/Fiji.app/ImageJ-linux64 --allow-multiple --headless --console -macro " + dir + File.separator + name + "_job" + job + ".ijm");
-                bw.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public boolean addUser(String name) throws ExecutionException, DSAccessException, DSOutOfServiceException {
         try {
