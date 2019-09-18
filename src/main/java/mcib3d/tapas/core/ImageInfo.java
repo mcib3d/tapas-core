@@ -1,13 +1,11 @@
 package mcib3d.tapas.core;
 
-import ij.IJ;
-
 import java.io.File;
 
 public class ImageInfo {
     private String project;
     private String dataset;
-    private String image;
+    private String name;
     private int channel = 1; // starts at 1
     private int frame = 1; // starts at 1
     // for files-based batch, should be "core" for core images
@@ -19,14 +17,14 @@ public class ImageInfo {
     public ImageInfo(String project, String dataset, String image) {
         this.project = project;
         this.dataset = dataset;
-        this.image = image;
+        this.name = image;
     }
 
     public ImageInfo(String project, String dataset, String image, int channel, int frame) {
         this.rootDir = "OMERO";
         this.project = project;
         this.dataset = dataset;
-        this.image = image;
+        this.name = image;
         this.channel = channel;
         this.frame = frame;
     }
@@ -36,7 +34,7 @@ public class ImageInfo {
         this.rootDir = rootDir;
         this.project = project;
         this.dataset = dataset;
-        this.image = image;
+        this.name = image;
         this.channel = channel;
         this.frame = frame;
     }
@@ -51,7 +49,7 @@ public class ImageInfo {
 
     public String getFilePath() {
         if (isOmero()) return rootDir;
-        return rootDir + project + File.separator + dataset + File.separator + image;
+        return rootDir + project + File.separator + dataset + File.separator + name;
     }
 
     public String getDirPath() {
@@ -80,12 +78,12 @@ public class ImageInfo {
         this.dataset = dataset;
     }
 
-    public String getImage() {
-        return image;
+    public String getName() {
+        return name;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getC() {
@@ -114,6 +112,6 @@ public class ImageInfo {
     }
 
     public String toString() {
-        return project + "/" + dataset + "/" + image + "-c" + channel + "-t" + frame;
+        return project + "/" + dataset + "/" + name + "-c" + channel + "-t" + frame;
     }
 }

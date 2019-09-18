@@ -7,7 +7,6 @@ package mcib3d.tapas.core;
  *     http://creativecommons.org/publicdomain/zero/1.0/
  */
 
-import com.sun.tools.doclint.Entity;
 import ij.IJ;
 import loci.formats.in.DefaultMetadataOptions;
 import loci.formats.in.MetadataLevel;
@@ -45,6 +44,7 @@ import omero.model.enums.UnitsLength;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -271,7 +271,7 @@ public class OmeroConnect {
         return getImageXYZ(image, t, c, 1, 1, 0, -1, 0, -1, 0, -1);
     }
 
-    public double[] getResolutionImage(ImageData imageData) throws ExecutionException,BigResult{
+    public double[] getResolutionImage(ImageData imageData) throws ExecutionException, BigResult {
         RawDataFacility rdf = gateway.getFacility(RawDataFacility.class);
         PixelsData pixels = imageData.getDefaultPixels();
         Length pixelsXY = pixels.getPixelSizeX(UnitsLength.MICROMETER);
@@ -360,6 +360,7 @@ public class OmeroConnect {
             return null;
         }
         handler.setScale(resXY * binXY, resZ * binZ, "um");
+        IJ.log("Calibration "+resXY+" "+resZ);
         // check plane size
         double maxSizePlane = 256000000; // maximum transfer size for OMERO
         double planeSize = (int) (sxfull * syfull);
@@ -532,7 +533,7 @@ public class OmeroConnect {
     public ImageData findOneImage(ImageInfo imageInfo) throws Exception {
         String project = imageInfo.getProject();
         String data = imageInfo.getDataset();
-        String image = imageInfo.getImage();
+        String image = imageInfo.getName();
         boolean strict = true;
 
         return findOneImage(project, data, image, strict);
@@ -679,7 +680,7 @@ public class OmeroConnect {
         config.password.set(encrypt.decrypt(creds[3]));
 
         // use .target instead ??
-        config.target.set("Dataset:"+datasetData.getId());
+        config.target.set("Dataset:" + datasetData.getId());
         //config.targetClass.set("omero.model.Dataset");
         //config.targetId.set(datasetData.getId());
         ImportTarget importTarget = config.getTarget();
@@ -1013,6 +1014,7 @@ public class OmeroConnect {
     public FileAnnotationData getFileAnnotation(ImageData imageData, String name, ArrayList<String> addUsers) throws ExecutionException, DSAccessException, DSOutOfServiceException {
         ArrayList<FileAnnotationData> list = (ArrayList<FileAnnotationData>) getFileAnnotations(imageData, addUsers);
         for (FileAnnotationData data : list) {
+            data.getAttachedFile();
             if (data.getFileName().equalsIgnoreCase(name)) return data;
         }
 
@@ -1143,12 +1145,12 @@ public class OmeroConnect {
     }
 
 
-    public void addFileAnnotation(ImageData image, File file, String comment) throws java.util.concurrent.ExecutionException, DSAccessException, DSOutOfServiceException {
+    public void addFileAnnotation(ImageData image, File file, String comment) throws ExecutionException, DSAccessException, DSOutOfServiceException {
         DataManagerFacility dm = gateway.getFacility(DataManagerFacility.class);
         // checking if annotation exists
         FileAnnotationData fileAnnotationData = getFileAnnotation(image, file.getName(), null);
         if (fileAnnotationData != null) {
-            IJ.log("Attachment " + fileAnnotationData.getFileName() + " already exists, deleting.");
+            IJ.log("The attachment " + fileAnnotationData.getFileName() + " already exists, deleting.");
             dm.delete(securityContext, fileAnnotationData.asIObject());
         }
         IJ.log("Attaching " + file.getAbsolutePath() + " to " + image.getName());
