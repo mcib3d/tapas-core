@@ -23,7 +23,7 @@
     <dependency>
         <groupId>net.imagej</groupId>
         <artifactId>ij</artifactId>
-        <version>1.52p</version>
+        <version>1.52q</version>
         <type>jar</type>
     </dependency>
         <dependency>
@@ -34,12 +34,12 @@
         <dependency>
             <groupId>ome</groupId>
             <artifactId>bio-formats_plugins</artifactId>
-            <version>6.0.1</version>
+            <version>6.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.openmicroscopy</groupId>
             <artifactId>omero-gateway</artifactId>
-            <version>5.5.3</version>
+            <version>5.5.4</version>
         </dependency>
         <dependency>
             <groupId>org.hsqldb</groupId>

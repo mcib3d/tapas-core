@@ -46,13 +46,9 @@ import omero.model.*;
 import omero.model.enums.ChecksumAlgorithmSHA1160;
 import omero.model.enums.UnitsLength;
 import omero.sys.ParametersI;
-import weka.filters.unsupervised.attribute.Copy;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -81,7 +77,7 @@ public class OmeroConnect {
     public OmeroConnect() {
         Logger simpleLogger = new SimpleLogger();
         gateway = new Gateway(simpleLogger);
-        System.out.println("omero connect : " + gateway);
+        //System.out.println("omero connect : " + gateway);
     }
 
     public static boolean notInExcludeList(String imageName, ArrayList<String> excludeList) {
@@ -523,12 +519,12 @@ public class OmeroConnect {
     }
 
 
-    public ImageData findOneImage(String project, String dataset, String image, boolean strict) throws Exception {
+    public ImageData findOneImage(String project, String data, String image, boolean strict) throws Exception {
         if (log) logger.log("Looking for project : " + project);
         ProjectData projectData = findProject(project, strict);
         if (projectData == null) return null;
         if (log) logger.log("Found project : " + projectData.getName());
-        DatasetData datasetData = findDataset(dataset, projectData, strict);
+        DatasetData datasetData = findDataset(data, projectData, strict);
         if (datasetData == null) return null;
         if (log) logger.log("Found dataset : " + datasetData.getName());
         ImageData imageData = findOneImage(datasetData, image, strict);
@@ -1029,6 +1025,46 @@ public class OmeroConnect {
         return null;
     }
 
+    private OriginalFile getOriginalFile(long id) throws Exception {
+        ParametersI param = new ParametersI();
+        param.map.put("id", omero.rtypes.rlong(id));
+        IQueryPrx svc = gateway.getQueryService(securityContext);
+        return (OriginalFile) svc.findByQuery("select p from OriginalFile as p where p.id = :id", param);
+    }
+
+    public File readAttachment(FileAnnotationData annotation) throws Exception {
+        int INC = 262144;
+        FileAnnotationData fa;
+        RawFileStorePrx store = gateway.getRawFileService(securityContext);
+        File file = File.createTempFile(annotation.getFileName(), ".tmp");
+
+        OriginalFile of;
+        try (FileOutputStream stream = new FileOutputStream(file)) {
+            fa = annotation;
+            //The id of the original file
+            of = getOriginalFile(fa.getFileID());
+            store.setFileId(fa.getFileID());
+            int offset = 0;
+            long size = of.getSize().getValue();
+            try {
+                for (offset = 0; (offset + INC) < size; ) {
+                    stream.write(store.read(offset, INC));
+                    offset += INC;
+                }
+            } finally {
+                stream.write(store.read(offset, (int) (size - offset)));
+            }
+        } finally {
+            store.close();
+        }
+
+        return file;
+    }
+
+    public File readAttachment(ImageInfo imageInfo, String name, ArrayList<String> users) throws Exception {
+        return readAttachment(getFileAnnotation(findOneImage(imageInfo), name, users));
+    }
+
 
     public void printAllAnnotations(ImageData image, ArrayList<String> addUsers) throws DSOutOfServiceException, ExecutionException, DSAccessException {
         //IJ.log("Finding pairs for keyword " + image.getName());
@@ -1163,43 +1199,6 @@ public class OmeroConnect {
         }
         IJ.log("Attaching " + file.getAbsolutePath() + " to " + image.getName());
         Future<FileAnnotationData> annotationData = dm.attachFile(securityContext, file, "application/octet-stream", comment, null, image);
-    }
-
-    public File readAttachment(FileAnnotationData annotation, String dir, String filename) throws Exception {
-        int INC = 262144;
-        RawFileStorePrx store = gateway.getRawFileService(securityContext);
-        File file = File.createTempFile("temp_file", ".tmp");
-
-        OriginalFile of;
-        try (FileOutputStream stream = new FileOutputStream(file)) {
-            //The id of the original file
-            of = getOriginalFile(annotation.getFileID());
-            store.setFileId(annotation.getFileID());
-            long size = of.getSize().getValue();
-            int offset = 0;
-            for (offset = 0; (offset + INC) < size; ) {
-                stream.write(store.read(offset, INC));
-                offset += INC;
-            }
-            stream.write(store.read(offset, (int) (size - offset)));
-            store.close();
-        }
-        File res = new File(dir + File.separator + filename);
-        if (res.exists()) {
-            IJ.log("File " + filename + " already exists, overwriting");
-            res.delete();
-        }
-        Files.copy(file.toPath(), res.toPath());
-        Files.delete(file.toPath());
-
-        return res;
-    }
-
-    private OriginalFile getOriginalFile(long id) throws Exception {
-        ParametersI param = new ParametersI();
-        param.map.put("id", omero.rtypes.rlong(id));
-        IQueryPrx svc = gateway.getQueryService(securityContext);
-        return (OriginalFile) svc.findByQuery("select p from OriginalFile as p where p.id = :id", param);
     }
 
     // TODO check and update
