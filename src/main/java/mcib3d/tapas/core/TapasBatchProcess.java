@@ -50,7 +50,7 @@ public class TapasBatchProcess {
             return analyseFileName(file, info);
         }
         if (file.contains("?name?")) {
-            file = file.replace("?name?", info.getName());
+            file = file.replace("?name?", info.getImage());
             return analyseFileName(file, info);
         }
         if (file.contains("?channel?")) {
@@ -138,7 +138,7 @@ public class TapasBatchProcess {
             try {
                 OmeroConnect connect = new OmeroConnect();
                 connect.connect();
-                ImageData imageData = connect.findOneImage(info.getProject(), info.getDataset(), info.getName(), true);
+                ImageData imageData = connect.findOneImage(info.getProject(), info.getDataset(), info.getImage(), true);
                 String value = TapasBatchProcess.analyseKeyValue(keyS, imageData, info, connect, users);
                 connect.disconnect();
                 return value;
@@ -289,7 +289,7 @@ public class TapasBatchProcess {
             IJ.log(" ");
             IJ.log("---------- Processing " + c + "/" + allImages.size() + " ----------");
             if (processOneImage(imageInfo) == null) {
-                IJ.log("***************** Pb after processing " + imageInfo.getName());
+                IJ.log("***************** Pb after processing " + imageInfo.getImage());
                 //return false;
             }
             c++;

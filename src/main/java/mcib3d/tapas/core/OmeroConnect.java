@@ -115,6 +115,8 @@ public class OmeroConnect {
 
     public void connect() throws Exception {
         String[] creds = getCredentials();
+        // TEST ONLY
+        System.out.println("Connecting to OMERO server " + creds[1] + ":" + creds[2] + " with user " + creds[0]);
         // decrypt password
         Encrypt encrypt = new Encrypt();
         LoginCredentials cred = new LoginCredentials(creds[0], encrypt.decrypt(creds[3]), creds[1], Integer.parseInt(creds[2]));
@@ -144,6 +146,7 @@ public class OmeroConnect {
 
     private String[] getCredentials() {
         // get from imagej
+        ij.Prefs.load(this.getClass(), null);
         String user = ij.Prefs.get("OMERO.TB.user.string", "user");
         String server = ij.Prefs.get("OMERO.TB.server.string", "server");
         String pass = ij.Prefs.get("OMERO.TB.pass.string", ".");
@@ -537,7 +540,7 @@ public class OmeroConnect {
     public ImageData findOneImage(ImageInfo imageInfo) throws Exception {
         String project = imageInfo.getProject();
         String data = imageInfo.getDataset();
-        String image = imageInfo.getName();
+        String image = imageInfo.getImage();
         boolean strict = true;
 
         return findOneImage(project, data, image, strict);
