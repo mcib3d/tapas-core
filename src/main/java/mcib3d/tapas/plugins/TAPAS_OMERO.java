@@ -5,6 +5,8 @@ import ij.WindowManager;
 import ij.plugin.frame.Recorder;
 import mcib3d.tapas.core.TapasBatchProcess;
 import mcib3d.tapas.core.OmeroConnect;
+import mcib3d.tapas.core.TapasProcessorAbstract;
+import mcib3d.tapas.core.TapasProcessorIJ;
 import mcib3d.tapas.utils.JobsGenerate;
 import omero.gateway.model.DatasetData;
 import omero.gateway.model.ImageData;
@@ -36,13 +38,25 @@ public class TAPAS_OMERO extends JFrame {
     OmeroConnect omero;
     DefaultListModel model = new DefaultListModel();
     File tapasFile;
+    // processor
+    TapasProcessorAbstract processor;
 
     public static void main(String args[]) {
         new ij.ImageJ();
         new TAPAS_OMERO();
     }
 
+    public TapasProcessorAbstract getProcessor() {
+        return processor;
+    }
+
+    public void setProcessor(TapasProcessorAbstract processorAbstract) {
+        this.processor = processorAbstract;
+    }
+
     public TAPAS_OMERO() {
+        // by default IJ processor
+        setProcessor(new TapasProcessorIJ());
         tapasFile = new File(IJ.getDirectory("imagej") + File.separator + "tapas.txt");
         IJ.log("Checking tapas file " + tapasFile.getAbsolutePath());
         if (!tapasFile.exists()) {
@@ -210,6 +224,10 @@ public class TAPAS_OMERO extends JFrame {
             IJ.log("Aborting");
             return;
         }
+        // get processor
+        processor = TapasBatchProcess.getProcessor(processFile);
+        IJ.log("Processing with "+processor.getNameProcessor());
+        setProcessor(processor);
 
         // TEST JOB
         if (jobsCheckBox.isSelected()) {
@@ -241,6 +259,7 @@ public class TAPAS_OMERO extends JFrame {
         int tmax = 1;
         // init to find images
         Thread thread = new Thread(() -> {
+            batchProcess.setProcessor(processor);
             batchProcess.initBatchOmero(project, dataset, imageFinal, cmin, cmax, tmin, tmax);
             batchProcess.processAllImages();
             try {

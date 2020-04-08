@@ -3,6 +3,7 @@ package mcib3d.tapas.plugins;
 import ij.IJ;
 import ij.WindowManager;
 import mcib3d.tapas.TapasProcessing;
+import mcib3d.tapas.TapasProcessingAbstract;
 import mcib3d.tapas.core.TapasBatchProcess;
 
 import javax.swing.*;
@@ -44,7 +45,7 @@ public class TAPAS_MENU extends JFrame {
     int maxParam = 10;
     JTextField paramsText[] = new JTextField[maxParam];
     JLabel paramsLabel[] = new JLabel[maxParam];
-    TapasProcessing currentTapas;
+    TapasProcessingAbstract currentTapas;
 
     public TAPAS_MENU() {
         // init parameters fields // FIXME dynamic
@@ -144,7 +145,7 @@ public class TAPAS_MENU extends JFrame {
         try {
             cls = Class.forName(className);
             Object object = cls.newInstance();
-            currentTapas = (TapasProcessing) object;
+            currentTapas = (TapasProcessingAbstract) object;
             textFieldDescription.setText(currentTapas.getName());
             // parameters
             String[] parameters = currentTapas.getParameters();

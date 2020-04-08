@@ -4,6 +4,7 @@ import ij.IJ;
 import ij.WindowManager;
 import ij.plugin.frame.Recorder;
 import mcib3d.tapas.core.TapasBatchProcess;
+import mcib3d.tapas.core.TapasProcessorIJ;
 
 import javax.swing.*;
 import java.awt.*;
@@ -123,6 +124,7 @@ public class TAPAS_FILES extends JFrame {
         int tmax = 1;
         // init to find images
         Thread thread = new Thread(() -> {
+            batchProcess.setProcessor(new TapasProcessorIJ());
             batchProcess.initBatchFiles(rootProject, project, dataset, imageFinal, cmin, cmax, tmin, tmax);
             batchProcess.processAllImages();
             try {

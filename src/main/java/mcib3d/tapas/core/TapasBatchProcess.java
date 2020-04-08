@@ -3,8 +3,10 @@ package mcib3d.tapas.core;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.io.FileSaver;
 import mcib3d.image3d.ImageInt;
-import mcib3d.tapas.TapasProcessing;
+import mcib3d.tapas.TapasProcessingAbstract;
+import mcib3d.utils.Logger.AbstractLog;
 import omero.gateway.exception.DSAccessException;
 import omero.gateway.exception.DSOutOfServiceException;
 import omero.gateway.model.DatasetData;
@@ -15,115 +17,26 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 public class TapasBatchProcess {
+    public static String version = "0.5";
     // list of global links (tapas variables), pb if many instances of this class ?
     private static HashMap<String, ImageInfo> links;
-    private File process;
     private ArrayList<ImageInfo> allImages;
-    private ArrayList<TapasProcessing> processings;
+    private ArrayList<TapasProcessingAbstract> processings;
+    private TapasProcessorAbstract processorAbstract;
     private HashMap<String, String> plugins;
+    private AbstractLog log;
     // additional connection information
     private ArrayList<Long> addUsers;
     private ArrayList<Long> addGroups; // not used
 
-    public static String version = "0.5";
-
     public TapasBatchProcess() {
         addUsers = new ArrayList<>();
         links = new HashMap<>();
-    }
-
-    public static String analyseFileName(String s, ImageInfo info) {
-        String file = s;
-        if ((s == null) || (s.isEmpty())) return s;
-        if (file.contains("?project?")) {
-            file = file.replace("?project?", info.getProject());
-            return analyseFileName(file, info);
-        }
-        if (file.contains("?dataset?")) {
-            file = file.replace("?dataset?", info.getDataset());
-            return analyseFileName(file, info);
-        }
-        if (file.contains("?name?")) {
-            file = file.replace("?name?", info.getImage());
-            return analyseFileName(file, info);
-        }
-        if (file.contains("?channel?")) {
-            file = file.replace("?channel?", "" + info.getC());
-            return analyseFileName(file, info);
-        }
-        if (file.contains("?channel+1?")) {
-            file = file.replace("?channel+1?", "" + (info.getC() + 1));
-            return analyseFileName(file, info);
-        }
-        if (file.contains("?channel-1?")) {
-            file = file.replace("?channel-1?", "" + (info.getC() - 1));
-            return analyseFileName(file, info);
-        }
-        if (file.contains("?frame?")) {
-            file = file.replace("?frame?", "" + info.getT());
-            return analyseFileName(file, info);
-        }
-        if (file.contains("?frame+1?")) {
-            file = file.replace("?frame+1?", "" + (info.getT() + 1));
-            return analyseFileName(file, info);
-        }
-        if (file.contains("?frame-1?")) {
-            file = file.replace("?frame-1?", "" + (info.getT() - 1));
-            return analyseFileName(file, info);
-        }
-
-        return file;
-    }
-
-    public static String analyseStringKeywords(String s, ImageInfo info) {
-        // first analyse names
-        String res = analyseFileName(s, info);
-        // system directories
-        String home = System.getProperty("user.home");
-        String ij = IJ.getDirectory("imagej");
-        String tmp = System.getProperty("java.io.tmpdir");
-        // we want these dir to NOT ends with /
-        if (home.endsWith(File.separator)) home = home.substring(0, home.length() - 1);
-        if (ij.endsWith(File.separator)) ij = ij.substring(0, ij.length() - 1);
-        if (tmp.endsWith(File.separator)) tmp = tmp.substring(0, tmp.length() - 1);
-        // analyse dir names
-        res = res.replace("?home?", home);
-        res = res.replace("?ij?", ij);
-        res = res.replace("?tmp?", tmp);
-
-        return res;
-    }
-
-    public static String analyseDirName(String s) {
-        if (s == null) return s;
-        if (s.isEmpty()) return s;
-        String dir = new String(s);
-        String home = System.getProperty("user.home");
-        String ij = IJ.getDirectory("imagej");
-        String tmp = System.getProperty("java.io.tmpdir");
-        // we want these dir to NOT ends with /
-        if (home.endsWith(File.separator)) home = home.substring(0, home.length() - 1);
-        if (ij.endsWith(File.separator)) ij = ij.substring(0, ij.length() - 1);
-        if (tmp.endsWith(File.separator)) tmp = tmp.substring(0, tmp.length() - 1);
-        // but we want final dir name to ends with /
-        if (dir.contains("?home?")) dir = dir.replace("?home?", home);
-        if (dir.contains("?ij?")) dir = dir.replace("?ij?", ij);
-        if (dir.contains("?tmp?")) dir = dir.replace("?tmp?", tmp);
-        if (!dir.endsWith(File.separator)) dir = dir.concat(File.separator);
-
-        return dir;
-    }
-
-    public static int analyseChannelFrameName(String s, ImageInfo info) {
-        if (s.contains("?channel?")) return info.getC();
-        else if (s.contains("?frame?")) return info.getT();
-        else return Integer.parseInt(s);
     }
 
     public static String getKey(String keyS, ImageInfo info, String usersS) {
@@ -178,7 +91,7 @@ public class TapasBatchProcess {
         if (pos2 < 0) return null;
         String key = keyS.substring(pos1 + 1, pos2);
         // analysing key value
-        String keyValue = analyseFileName(key, info);
+        String keyValue = TapasBatchUtils.analyseFileName(key, info);
         String value = connect.getValuePair(image, keyValue, users);
         if (value == null) {
             //IJ.log("No key "+keyS);
@@ -204,6 +117,88 @@ public class TapasBatchProcess {
         return image;
     }
 
+    public static ImagePlus inputImage(ImageInfo info, String project, String dataset, String name, int c, int t) {
+        ImagePlus plus = null;
+        if (info.isOmero()) {
+            try {
+                OmeroConnect connect = new OmeroConnect();
+                connect.connect();
+                ImageData imageData = connect.findOneImage(project, dataset, name, true);
+                if (imageData == null) {
+                    IJ.log("Cannot find " + project + " / " + dataset + " / " + name);
+                    connect.disconnect();
+                    return null;
+                }
+                IJ.log("Loading from OMERO : " + imageData.getName() + " c-" + c + " t-" + t);
+                plus = connect.getImage(imageData, t, c).getImagePlus();
+                connect.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else { // use bioformats
+            ImageInfo info2 = new ImageInfo(info.getRootDir(), project, dataset, name, c, t);
+            IJ.log("Loading with BioFormats: " + info2.getFilePath());
+            plus = BioformatsReader.OpenImagePlus(info2.getFilePath(), info2.getC() - 1, info2.getT() - 1);
+            if (plus == null) {
+                IJ.log("Could not load " + info2.getFilePath());
+                return null;
+            }
+            plus.setTitle(name);
+        }
+
+        return plus;
+    }
+
+    public static boolean outputImage(ImagePlus input, ImageInfo info, String project, String dataset, String name) {
+        boolean ok = true;
+        if (info.isFile()) {
+            IJ.log("Saving to FILE");
+            ImageInfo info2 = new ImageInfo(info.getRootDir(), project, dataset, name, info.getC(), info.getT());
+            String path2 = info2.getFilePath();
+            // check if file exists
+            File file = new File(path2);
+            if (file.exists()) {
+                IJ.log("File  " + path2 + " already exists, deleting");
+                file.delete();
+            }
+            if (!saveFile(input, path2)) {
+                IJ.log("Pb saving " + path2);
+                ok = false;
+            } else IJ.log("Saved  " + path2);
+        } else {
+            // import into core
+            try {
+                IJ.log("Saving to OMERO : " + project + "/" + dataset + "/" + name);
+                // save temporary file
+                String dirTmp = System.getProperty("java.io.tmpdir");
+                String pathOmero = dirTmp + File.separator + name;
+                if (!saveFile(input, pathOmero)) {
+                    IJ.log("Pb saving temp " + pathOmero);
+                    ok = false;
+                }
+                OmeroConnect connect = new OmeroConnect();
+                connect.connect();
+                connect.addImageToDataset(project, dataset, dirTmp + File.separator, name);
+                connect.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return ok;
+    }
+
+    private static boolean saveFile(ImagePlus input, String path) {
+        FileSaver saver = new FileSaver(input);
+        boolean saveOk;
+        if (input.getNSlices() > 1) {
+            saveOk = saver.saveAsTiffStack(path);
+        } else {
+            saveOk = saver.saveAsTiff(path);
+        }
+
+        return saveOk;
+    }
 
     public static ImagePlus getImageFromFileParameters(String dir, String file, ImageInfo current) {
         ImageInt img;
@@ -225,8 +220,8 @@ public class TapasBatchProcess {
             }
         } else {
             // file
-            String nameF = TapasBatchProcess.analyseFileName(file, current);
-            String dirF = TapasBatchProcess.analyseDirName(dir);
+            String nameF = TapasBatchUtils.analyseFileName(file, current);
+            String dirF = TapasBatchUtils.analyseDirName(dir);
             IJ.log("Opening " + dirF + nameF);
             ImagePlus plus = IJ.openImage(dirF + nameF);
             if (plus == null) return null;
@@ -236,7 +231,6 @@ public class TapasBatchProcess {
         return null;
     }
 
-
     public static void setlink(String name, ImageInfo info) {
         links.put(name, info);
     }
@@ -245,61 +239,137 @@ public class TapasBatchProcess {
         return links.get(name);
     }
 
+    public static ArrayList<TapasProcessingAbstract> readProcessings(String file, HashMap<String, String> plugins) {
+        ArrayList<TapasProcessingAbstract> tapasProcessings = new ArrayList<>();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line = reader.readLine();
+            String info[] = new String[2];
+            TapasProcessingAbstract processing = null;
+            while (line != null) {
+                if ((!line.startsWith("//")) && (!line.isEmpty())) {
+                    //String info[] = line.split(":"); // FIXME, finds first : , in case : in dir name (Windows)
+                    int pos0 = line.indexOf(":");
+                    if (pos0 == -1) IJ.log("Pb line does not contain \":\" " + line);
+                    info[0] = line.substring(0, pos0);
+                    info[1] = line.substring(pos0 + 1);
+                    if ((info[0].isEmpty()) || (info[1].isEmpty())) IJ.log("Pb with tapas processing line " + line);
+                    else {
+                        if (info[0].equalsIgnoreCase("process")) {
+                            processing = createProcess(info[1], plugins);
+                            if (processing == null) {
+                                IJ.log("No tapas with name " + info[1]);
+                                return null;
+                            }
+                            tapasProcessings.add(processing);
+
+                        } else if (!info[0].equalsIgnoreCase("processor")) {
+                            if (!processing.setParameter(info[0].trim(), info[1].trim())) {
+                                IJ.log("Pb when processing parameters : " + info[0] + " with value " + info[1]);
+                                return null;
+                            }
+                        }
+                    }
+                }
+                line = reader.readLine();
+            }
+        } catch (FileNotFoundException e) {
+            IJ.log("Process File not found " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            IJ.log("Process File pb " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+
+        return tapasProcessings;
+    }
+
+    private static TapasProcessingAbstract createProcess(String info, HashMap<String, String> plugins) {
+        try {
+            info = info.trim();
+            String processClass = plugins.get(info);
+            IJ.log("Creating process " + info + ":" + processClass);
+            if (processClass == null) return null;
+            Class cls = Class.forName(processClass);
+            Object object = cls.newInstance();
+            TapasProcessingAbstract processing = (TapasProcessingAbstract) object;
+            return processing;
+        } catch (ClassNotFoundException e) {
+            IJ.log("Error Class Not Found " + plugins.get(info));
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            IJ.log("Access Class Not Found " + plugins.get(info));
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            IJ.log("Error cannot create object " + plugins.get(info));
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static HashMap<String, String> readPluginsFile(String file, boolean verbose) {
+        HashMap<String, String> map = new HashMap<>();
+        IJ.log("Reading tapas file " + file);
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line = reader.readLine();
+            int c = 0;
+            while (line != null) {
+                c++;
+                int idx = line.indexOf("//");
+                if ((idx < 0) && (!line.isEmpty())) { // strange error on linux ??
+                    String info[] = line.split(":");
+                    if (info.length != 2) {
+                        IJ.log("Pb for tapas plugins with line " + c + ":" + line + " ");
+                        return null;
+                    }
+                    map.put(info[0].trim(), info[1].trim());
+                    if (verbose) IJ.log("Found plugin " + info[0].trim() + " " + info[1].trim());
+                }
+                line = reader.readLine();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return map;
+    }
+
+    public TapasProcessorAbstract getProcessor() {
+        return processorAbstract;
+    }
+
+    public void setProcessor(TapasProcessorAbstract processorAbstract) {
+        this.processorAbstract = processorAbstract;
+    }
+
     public boolean init(String process, String tapas) {
-        this.process = new File(process);
+        File process1 = new File(process);
         if (!readPlugins(tapas)) return false;
         if (!readProcessing(process, plugins)) return false;
 
         return true;
     }
 
-    public ImagePlus processOneImage(ImageInfo info) {
-        ImagePlus img = null;
-        IJ.log("PROCESSING " + info);
-        Instant start = Instant.now();
-        for (TapasProcessing processing : processings) {
-            processing.setCurrentImage(info);
-            IJ.log("* " + processing.getName());
-            img = processing.execute(img);
-            if (img == null) {
-                IJ.log("Processing stopped.");
-                return null;
-            }
-            System.gc();
-        }
-        Instant end = Instant.now();
-        IJ.log("Processing took " + java.time.Duration.between(start, end));
-
-        return img;
-    }
-
-    public ImagePlus testProcessing() {
-        IJ.log("TEST");
-        ImageInfo imageInfo = allImages.get(0);
-        ImagePlus res = processOneImage(imageInfo);
-        IJ.log("PROCESSING DONE");
-
-        return res;
-    }
-
     public boolean processAllImages() {
-        IJ.log("PROCESSING " + allImages.size() + " images");
-        int c = 1;
-        for (ImageInfo imageInfo : allImages) {
-            IJ.log(" ");
-            IJ.log("---------- Processing " + c + "/" + allImages.size() + " ----------");
-            if (processOneImage(imageInfo) == null) {
-                IJ.log("***************** Pb after processing " + imageInfo.getImage());
-                //return false;
-            }
-            c++;
-        }
-        IJ.log("********** PROCESSING DONE **********");
-
-        return true;
+        processorAbstract.init(processings, allImages);
+        return processorAbstract.processAllImages();
     }
 
-    public boolean setProcessing(ArrayList<TapasProcessing> process) {
+    public boolean processOneImage(ImageInfo info) {
+        processorAbstract.init(processings);
+
+        return (processorAbstract.processOneImage(info) != null);
+    }
+
+    public boolean setProcessing(ArrayList<TapasProcessingAbstract> process) {
         processings = process;
 
         return true;
@@ -434,7 +504,6 @@ public class TapasBatchProcess {
         initBatchOmero(project, datasetName, image, exclude, c0, c1, t0, t1, true);
     }
 
-
     public void initBatchOmero(String project, String datasetName, String image, ArrayList<String> exclude, int c0, int c1, int t0, int t1, boolean strict) {
         allImages = new ArrayList<>();
         // get all datasets
@@ -482,7 +551,6 @@ public class TapasBatchProcess {
         }
     }
 
-
     public boolean addUser(String name) throws ExecutionException, DSAccessException, DSOutOfServiceException {
         try {
             if ((name == null) || (name.isEmpty()) || (name.equals("-"))) return true;
@@ -503,7 +571,6 @@ public class TapasBatchProcess {
         return true;
     }
 
-
     public ArrayList<Long> getAddUsers() {
         return addUsers;
     }
@@ -516,13 +583,21 @@ public class TapasBatchProcess {
         return groupId;
     }
 
-    public static ArrayList<TapasProcessing> readProcessings(String file, HashMap<String, String> plugins) {
-        ArrayList<TapasProcessing> tapasProcessings = new ArrayList<>();
+    public boolean readProcessing(String file, HashMap<String, String> plugins) {
+        ArrayList<TapasProcessingAbstract> tapasProcessings = readProcessings(file, plugins);
+        if (tapasProcessings == null) return false;
+        if (processings == null) processings = tapasProcessings;
+
+        return true;
+    }
+
+    public static TapasProcessorAbstract getProcessor(String file) {
+        TapasProcessorAbstract processorAbstract = new TapasProcessorIJ();
+
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String line = reader.readLine();
             String info[] = new String[2];
-            TapasProcessing processing = null;
             while (line != null) {
                 if ((!line.startsWith("//")) && (!line.isEmpty())) {
                     //String info[] = line.split(":"); // FIXME, finds first : , in case : in dir name (Windows)
@@ -532,19 +607,10 @@ public class TapasBatchProcess {
                     info[1] = line.substring(pos0 + 1);
                     if ((info[0].isEmpty()) || (info[1].isEmpty())) IJ.log("Pb with tapas processing line " + line);
                     else {
-                        if (info[0].equalsIgnoreCase("process")) {
-                            processing = createProcess(info[1], plugins);
-                            if (processing == null) {
-                                IJ.log("No tapas with name " + info[1]);
-                                return null;
-                            }
-                            tapasProcessings.add(processing);
-
-                        } else {
-                            if (!processing.setParameter(info[0].trim(), info[1].trim())) {
-                                IJ.log("Pb when processing parameters : " + info[0] + " with value " + info[1]);
-                                return null;
-                            }
+                        if (info[0].equalsIgnoreCase("processor")) {
+                            Class cls = Class.forName(info[1]);
+                            Object object = cls.newInstance();
+                            processorAbstract = (TapasProcessorAbstract) object;
                         }
                     }
                 }
@@ -558,73 +624,15 @@ public class TapasBatchProcess {
             IJ.log("Process File pb " + e.getMessage());
             e.printStackTrace();
             return null;
-        }
-
-        return tapasProcessings;
-    }
-
-    public boolean readProcessing(String file, HashMap<String, String> plugins) {
-        ArrayList<TapasProcessing> tapasProcessings = readProcessings(file, plugins);
-        if (tapasProcessings == null) return false;
-        if (processings == null) processings = new ArrayList<>(tapasProcessings.size());
-        processings.addAll(tapasProcessings);
-        return true;
-    }
-
-    private static TapasProcessing createProcess(String info, HashMap<String, String> plugins) {
-        try {
-            info = info.trim();
-            String processClass = plugins.get(info);
-            IJ.log("Creating process " + info + ":" + processClass);
-            if (processClass == null) return null;
-            Class cls = Class.forName(processClass);
-            Object object = cls.newInstance();
-            TapasProcessing processing = (TapasProcessing) object;
-            return processing;
-        } catch (ClassNotFoundException e) {
-            IJ.log("Error Class Not Found " + plugins.get(info));
-            e.printStackTrace();
         } catch (IllegalAccessException e) {
-            IJ.log("Access Class Not Found " + plugins.get(info));
             e.printStackTrace();
         } catch (InstantiationException e) {
-            IJ.log("Error cannot create object " + plugins.get(info));
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
 
-        return null;
-    }
-
-    public static HashMap<String, String> readPluginsFile(String file, boolean verbose) {
-        HashMap<String, String> map = new HashMap<>();
-        IJ.log("Reading tapas file " + file);
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            String line = reader.readLine();
-            int c = 0;
-            while (line != null) {
-                c++;
-                int idx = line.indexOf("//");
-                if ((idx < 0)&& (!line.isEmpty())) { // strange error on linux ??
-                    String info[] = line.split(":");
-                    if (info.length != 2) {
-                        IJ.log("Pb for tapas plugins with line " + c + ":" + line + " ");
-                        return null;
-                    }
-                    map.put(info[0].trim(), info[1].trim());
-                    if (verbose) IJ.log("Found plugin " + info[0].trim() + " " + info[1].trim());
-                }
-                line = reader.readLine();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return map;
+        return processorAbstract;
     }
 
     public boolean readPlugins(String file) {
