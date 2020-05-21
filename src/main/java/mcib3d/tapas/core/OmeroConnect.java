@@ -8,6 +8,8 @@ package mcib3d.tapas.core;
  */
 
 import ij.IJ;
+import ij.gui.OvalRoi;
+import ij.gui.PointRoi;
 import loci.formats.in.DefaultMetadataOptions;
 import loci.formats.in.MetadataLevel;
 import mcib3d.geom.Object3D;
@@ -47,6 +49,7 @@ import omero.model.enums.ChecksumAlgorithmSHA1160;
 import omero.model.enums.UnitsLength;
 import omero.sys.ParametersI;
 
+import java.awt.geom.Point2D;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -544,6 +547,64 @@ public class OmeroConnect {
         boolean strict = true;
 
         return findOneImage(project, data, image, strict);
+    }
+
+    /**
+     Retrieve image rois (Philippe Mailly)
+     * @param image
+     * @return roiList
+     * @throws java.util.concurrent.ExecutionException
+     * @throws omero.gateway.exception.DSOutOfServiceException
+     * @throws omero.gateway.exception.DSAccessException
+     */
+
+    public  List<ij.gui.Roi> getImageRois (ImageData image) throws ExecutionException, DSOutOfServiceException, DSAccessException {
+        List<ij.gui.Roi> roiList = new ArrayList<>();
+        ROIFacility roifac = gateway.getFacility(ROIFacility.class);
+        //Retrieve the roi linked to an image
+        List<ROIResult> rois_result = roifac.loadROIs(securityContext, image.getId());
+        ij.gui.Roi roi = null;
+        for (ROIResult rois : rois_result) {
+            for (ROIData r : rois.getROIs()) {
+                for (ShapeData s : r.getShapes()) {
+                    long id = s.getId();
+                    int time = s.getT();
+                    int z = s.getZ();
+                    if (s instanceof RectangleData) {
+                        RectangleData rectData = (RectangleData) s;
+                        roi = new ij.gui.Roi(rectData.getX(), rectData.getY(), rectData.getWidth(), rectData.getHeight());
+                    }
+                    if (s instanceof EllipseData) {
+                        EllipseData ellipse = (EllipseData) s;
+                        roi = new ij.gui.OvalRoi(ellipse.getX(), ellipse.getY(), ellipse.getRadiusX(), ellipse.getRadiusY());
+                    }
+                    if (s instanceof PointData) {
+                        PointData pt = (PointData) s;
+                        roi = new ij.gui.PointRoi(pt.getX(), pt.getY());
+                    }
+                    if (s instanceof LineData) {
+                        LineData lineData = (LineData) s;
+                        roi = new ij.gui.Line(lineData.getX1(), lineData.getY1(), lineData.getX2(), lineData.getY2());
+                    }
+                    if (s instanceof MaskData) {
+                        MaskData maskData = (MaskData) s;
+                        roi = new ij.gui.Roi(maskData.getX(), maskData.getY(), maskData.getWidth(), maskData.getHeight());
+
+                    }
+                    if (s instanceof PolygonData) {
+                        PolygonData polyData = (PolygonData) s;
+                        List<Point2D.Double> points = polyData.getPoints();
+                        java.awt.Polygon poly = new java.awt.Polygon();
+                        for (Point2D.Double pt : points) {
+                            poly.addPoint((int)Math.round(pt.getX()), (int)Math.round(pt.getY()));
+                        }
+                        roi = new ij.gui.PolygonRoi(poly, ij.gui.Roi.POLYGON);
+                    }
+                }
+                roiList.add(roi);
+            }
+        }
+        return(roiList);
     }
 
 
