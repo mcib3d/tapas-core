@@ -6,7 +6,7 @@
 
     <groupId>mcib3d</groupId>
     <artifactId>tapas-core</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
     <version>0.6.1</version>
     <build>
         <plugins>
