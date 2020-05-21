@@ -7,7 +7,7 @@
     <groupId>mcib3d</groupId>
     <artifactId>tapas-core</artifactId>
     <packaging>pom</packaging>
-    <version>0.5</version>
+    <version>0.6.0</version>
     <build>
         <plugins>
             <plugin>
@@ -25,13 +25,13 @@
     <dependency>
         <groupId>net.imagej</groupId>
         <artifactId>ij</artifactId>
-        <version>1.52q</version>
+        <version>1.53a</version>
         <type>jar</type>
     </dependency>
         <dependency>
             <groupId>com.github.mcib3d</groupId>
             <artifactId>mcib3d-core</artifactId>
-            <version>3.96</version>
+            <version>3.96.2</version>
         </dependency>
         <dependency>
             <groupId>ome</groupId>
