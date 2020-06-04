@@ -7,6 +7,7 @@ import ij.io.FileSaver;
 import mcib3d.image3d.ImageInt;
 import mcib3d.tapas.TapasProcessingAbstract;
 import mcib3d.utils.Logger.AbstractLog;
+import mcib3d.utils.Logger.IJLog;
 import omero.gateway.exception.DSAccessException;
 import omero.gateway.exception.DSOutOfServiceException;
 import omero.gateway.model.DatasetData;
@@ -22,45 +23,23 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 public class TapasBatchProcess {
-    public static String version = "0.5";
+    public static String version = "0.6.3";
     // list of global links (tapas variables), pb if many instances of this class ?
     private static HashMap<String, ImageInfo> links;
     private ArrayList<ImageInfo> allImages;
     private ArrayList<TapasProcessingAbstract> processings;
     private TapasProcessorAbstract processorAbstract;
     private HashMap<String, String> plugins;
-    private AbstractLog log;
     // additional connection information
     private ArrayList<Long> addUsers;
     private ArrayList<Long> addGroups; // not used
 
+    private AbstractLog log = new IJLog();
+    private AbstractLog error = new IJLog();
+
     public TapasBatchProcess() {
         addUsers = new ArrayList<>();
         links = new HashMap<>();
-    }
-
-    public static String getKey(String keyS, ImageInfo info, String usersS) {
-        ArrayList<String> users = new ArrayList<>();
-        if ((!usersS.isEmpty()) && (!usersS.equalsIgnoreCase("-"))) {
-            String[] line = usersS.split(",");
-            for (String st : line) {
-                users.add(st);
-            }
-        }
-        if (keyS.contains("KEY_")) {
-            try {
-                OmeroConnect connect = new OmeroConnect();
-                connect.connect();
-                ImageData imageData = connect.findOneImage(info.getProject(), info.getDataset(), info.getImage(), true);
-                String value = TapasBatchProcess.analyseKeyValue(keyS, imageData, info, connect, users);
-                connect.disconnect();
-                return value;
-            } catch (Exception e) {
-                IJ.log("Pb with key " + keyS);
-            }
-        }
-
-        return keyS;
     }
 
     @Deprecated
@@ -81,28 +60,8 @@ public class TapasBatchProcess {
         return s.replace(keyValue, value);
     }
 
-    public static String analyseKeyValue(String keyS, ImageData image, ImageInfo info, OmeroConnect connect, ArrayList users) throws ExecutionException, DSAccessException, DSOutOfServiceException {
-        if (!keyS.contains("KEY_")) return null;
-        String result = new String(keyS);
-        int pos0 = result.indexOf("KEY_");
-        int pos1 = result.indexOf("_", pos0);
-        if (pos1 < 0) return null;
-        int pos2 = result.length();
-        if (pos2 < 0) return null;
-        String key = keyS.substring(pos1 + 1, pos2);
-        // analysing key value
-        String keyValue = TapasBatchUtils.analyseFileName(key, info);
-        String value = connect.getValuePair(image, keyValue, users);
-        if (value == null) {
-            //IJ.log("No key "+keyS);
-            return null;
-        }
-
-        return value;
-    }
-
+    // not used much
     private static ImageInfo analyseLinkName(String s, ImageInfo info) {
-        //IJ.log("Analysing link : " + s);
         if (!s.contains("LINK_")) return null;
         String result = s;
         int pos0 = result.indexOf("LINK_");
@@ -351,7 +310,6 @@ public class TapasBatchProcess {
     }
 
     public boolean init(String process, String tapas) {
-        File process1 = new File(process);
         if (!readPlugins(tapas)) return false;
         if (!readProcessing(process, plugins)) return false;
 
@@ -386,7 +344,7 @@ public class TapasBatchProcess {
             else {
                 datasets = new ArrayList<>();
                 DatasetData datasetData = omeroConnect.findDataset(dataset, projectData, true);
-                if (datasetData == null) IJ.log("No dataset " + dataset + " found");
+                if (datasetData == null) error.log("No dataset " + dataset + " found");
                 else datasets.add(datasetData);
             }
             omeroConnect.disconnect();
@@ -486,8 +444,7 @@ public class TapasBatchProcess {
         return allFiles;
     }
 
-    private ArrayList<ImageInfo> initOmeroInfoFromImages(String project, DatasetData
-            dataset, ArrayList<ImageData> images, int c0, int c1, int t0, int t1) {
+    private ArrayList<ImageInfo> initOmeroInfoFromImages(String project, DatasetData dataset, ArrayList<ImageData> images, int c0, int c1, int t0, int t1) {
         ArrayList<ImageInfo> infos = new ArrayList<>();
         for (ImageData image : images)
             for (int c = c0; c <= c1; c++) {
@@ -508,13 +465,13 @@ public class TapasBatchProcess {
         allImages = new ArrayList<>();
         // get all datasets
         ArrayList<DatasetData> datasets = getInitDatasets(project, datasetName);
-        if ((datasets == null) || (datasets.isEmpty())) IJ.log("No datasets found");
+        if ((datasets == null) || (datasets.isEmpty())) error.log("No datasets found");
         for (DatasetData dataset : datasets) {
-            IJ.log("Searching in dataset " + dataset);
+            log.log("Searching in dataset " + dataset);
             ArrayList<ImageData> images = getInitImagesInDataset(dataset, image, exclude, strict);
-            if (images == null) IJ.log("No images found");
+            if (images == null) error.log("No images found");
             else {
-                IJ.log("Tapas found " + images.size() + " images to process");
+                log.log("Tapas found " + images.size() + " images to process");
                 allImages.addAll(initOmeroInfoFromImages(project, dataset, images, c0, c1, t0, t1));
             }
         }
@@ -544,7 +501,7 @@ public class TapasBatchProcess {
         for (String file : files) {
             for (int t = t0; t <= t1; t++) {
                 for (int c = c0; c <= c1; c++) {
-                    IJ.log("Adding : " + root + "/" + project + "/" + datasetName + "/" + file + "-" + c + "-" + t);
+                    log.log("Adding : " + root + "/" + project + "/" + datasetName + "/" + file + "-" + c + "-" + t);
                     allImages.add(new ImageInfo(root, project, datasetName, file, c, t));
                 }
             }
@@ -561,7 +518,7 @@ public class TapasBatchProcess {
                 if (!addUsers.contains(id))
                     addUsers.add(id);
             } else {
-                IJ.log("Could not find user " + name);
+                error.log("Could not find user " + name);
                 return false;
             }
             connect.disconnect();
@@ -593,7 +550,6 @@ public class TapasBatchProcess {
 
     public static TapasProcessorAbstract getProcessor(String file) {
         TapasProcessorAbstract processorAbstract = new TapasProcessorIJ();
-
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String line = reader.readLine();

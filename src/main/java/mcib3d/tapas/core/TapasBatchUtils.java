@@ -3,10 +3,15 @@ package mcib3d.tapas.core;
 import ij.IJ;
 import ij.ImagePlus;
 import mcib3d.image3d.ImageInt;
+import omero.gateway.exception.DSAccessException;
+import omero.gateway.exception.DSOutOfServiceException;
 import omero.gateway.model.ImageData;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class TapasBatchUtils {
 
@@ -100,4 +105,99 @@ public class TapasBatchUtils {
     }
 
 
+    private static boolean attach(ImageInfo info, File file, String project, String dataset, String name) {
+        boolean ok = false;
+        if (info.isFile()) { // if file copy in same dataset directory
+            ok = attachFiles(info, file, project, dataset);
+        } else {
+            ok = attachOMERO(file, project, dataset, name);
+        }
+
+        return ok;
+    }
+
+    private static boolean attachFiles(ImageInfo info, File file, String project, String dataset) {
+        String name = file.getName();
+        String path = info.getRootDir() + project + File.separator + dataset + File.separator + name;
+        // new 0.6.3, put in a folder "attachments"
+        File attachFolder = new File(info.getRootDir() + project + File.separator + dataset + File.separator + "attachments" + File.separator);
+        if (!attachFolder.exists()) {
+            IJ.log("Creating folder " + attachFolder + " to store attachments");
+            attachFolder.mkdir();
+        }
+        path = attachFolder.getPath() + name;
+        try {
+            IJ.log("Attaching to FILES");
+            File file2 = new File(path);
+            // delete if exist
+            if (file2.exists()) {
+                IJ.log("File " + file2.getPath() + " exists. Overwriting");
+                file2.delete();
+            }
+            Files.copy(file.toPath(), file2.toPath());
+        } catch (IOException e) {
+            IJ.log("Could not copy " + file.getPath() + " to " + path);
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean attachOMERO(File file, String project, String dataset, String name) {
+        try {
+            IJ.log("Attaching to OMERO");
+            OmeroConnect connect = new OmeroConnect();
+            connect.setLog(false);
+            connect.connect();
+            connect.addFileAnnotation(connect.findOneImage(project, dataset, name, true), file);
+            connect.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    public static String getKey(String keyS, ImageInfo info, String usersS) {
+        ArrayList<String> users = new ArrayList<>();
+        if ((!usersS.isEmpty()) && (!usersS.equalsIgnoreCase("-"))) {
+            String[] line = usersS.split(",");
+            for (String st : line) {
+                users.add(st);
+            }
+        }
+        if (keyS.contains("KEY_")) {
+            try {
+                OmeroConnect connect = new OmeroConnect();
+                connect.connect();
+                ImageData imageData = connect.findOneImage(info.getProject(), info.getDataset(), info.getImage(), true);
+                String value = analyseKeyValue(keyS, imageData, info, connect, users);
+                connect.disconnect();
+                return value;
+            } catch (Exception e) {
+                IJ.log("Pb with key " + keyS);
+            }
+        }
+
+        return keyS;
+    }
+
+    public static String analyseKeyValue(String keyS, ImageData image, ImageInfo info, OmeroConnect connect, ArrayList users) throws ExecutionException, DSAccessException, DSOutOfServiceException {
+        if (!keyS.contains("KEY_")) return null;
+        String result = new String(keyS);
+        int pos0 = result.indexOf("KEY_");
+        int pos1 = result.indexOf("_", pos0);
+        if (pos1 < 0) return null;
+        int pos2 = result.length();
+        if (pos2 < 0) return null;
+        String key = keyS.substring(pos1 + 1, pos2);
+        // analysing key value
+        String keyValue = analyseFileName(key, info);
+        String value = connect.getValuePair(image, keyValue, users);
+        if (value == null) {
+            IJ.log("No key " + keyS);
+            return null;
+        }
+
+        return value;
+    }
 }

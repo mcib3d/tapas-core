@@ -1,7 +1,5 @@
 package mcib3d.tapas.core;
 
-import ij.IJ;
-import mcib3d.tapas.TapasProcessing;
 import mcib3d.tapas.TapasProcessingAbstract;
 import mcib3d.utils.Logger.AbstractLog;
 import mcib3d.utils.Logger.IJLog;
