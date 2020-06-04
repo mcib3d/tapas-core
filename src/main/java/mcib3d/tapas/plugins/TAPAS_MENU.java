@@ -2,8 +2,8 @@ package mcib3d.tapas.plugins;
 
 import ij.IJ;
 import ij.WindowManager;
-import mcib3d.tapas.TapasProcessingAbstract;
 import mcib3d.tapas.core.TapasBatchProcess;
+import mcib3d.tapas.core.TapasProcessingAbstract;
 
 import javax.swing.*;
 import java.awt.*;

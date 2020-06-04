@@ -1,7 +1,5 @@
 package mcib3d.tapas.core;
 
-import mcib3d.tapas.core.ImageInfo;
-
 public interface TapasProcessingAbstract<Image> {
     boolean setParameter(String id, String value) ;
 

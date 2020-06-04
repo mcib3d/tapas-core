@@ -40,7 +40,7 @@ public class CheckInstall {
         try {
             loader.loadClass("mcib3d.image3d.ImageHandler");
         } catch (Exception e) {
-            ij.IJ.log("mcib3d-core not installed. Please install from\nhttp://imagejdocu.tudor.lu/doku.php?id=plugin:stacks:3d_ij_suite:start or from Update Site in Fiji.");
+            ij.IJ.log("mcib3d-core not installed. Please install from\nhttp://imagejdocu.list.lu/doku.php?id=plugin:stacks:3d_ij_suite:start or from Update Site in Fiji.");
             complete = false;
         }
 //        try {
@@ -78,7 +78,7 @@ public class CheckInstall {
         try {
             loader.loadClass("org.openmicroscopy.shoola.MainIJPlugin");
         } catch (Exception e) {
-            ij.IJ.log("OMERO not installed, please install.");
+            ij.IJ.log("OMERO plugin not installed, please install omero-insight for Fiji, even if you do not have an OMERO server.");
             complete = false;
         }
         try {
