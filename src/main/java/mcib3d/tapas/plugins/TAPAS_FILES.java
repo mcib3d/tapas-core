@@ -3,8 +3,8 @@ package mcib3d.tapas.plugins;
 import ij.IJ;
 import ij.WindowManager;
 import ij.plugin.frame.Recorder;
+import mcib3d.tapas.IJ.TapasProcessorIJ;
 import mcib3d.tapas.core.TapasBatchProcess;
-import mcib3d.tapas.core.TapasProcessorIJ;
 
 import javax.swing.*;
 import java.awt.*;

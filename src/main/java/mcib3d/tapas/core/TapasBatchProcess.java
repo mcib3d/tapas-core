@@ -5,7 +5,7 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.io.FileSaver;
 import mcib3d.image3d.ImageInt;
-import mcib3d.tapas.TapasProcessingAbstract;
+import mcib3d.tapas.IJ.TapasProcessorIJ;
 import mcib3d.utils.Logger.AbstractLog;
 import mcib3d.utils.Logger.IJLog;
 import omero.gateway.exception.DSAccessException;

@@ -1,4 +1,4 @@
-package mcib3d.tapas;
+package mcib3d.tapas.core;
 
 import mcib3d.tapas.core.ImageInfo;
 
