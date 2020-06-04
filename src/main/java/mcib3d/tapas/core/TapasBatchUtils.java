@@ -105,7 +105,7 @@ public class TapasBatchUtils {
     }
 
 
-    private static boolean attach(ImageInfo info, File file, String project, String dataset, String name) {
+    public static boolean attach(ImageInfo info, File file, String project, String dataset, String name) {
         boolean ok = false;
         if (info.isFile()) { // if file copy in same dataset directory
             ok = attachFiles(info, file, project, dataset);
@@ -116,7 +116,7 @@ public class TapasBatchUtils {
         return ok;
     }
 
-    private static boolean attachFiles(ImageInfo info, File file, String project, String dataset) {
+    public static boolean attachFiles(ImageInfo info, File file, String project, String dataset) {
         String name = file.getName();
         String path = info.getRootDir() + project + File.separator + dataset + File.separator + name;
         // new 0.6.3, put in a folder "attachments"
@@ -143,7 +143,7 @@ public class TapasBatchUtils {
         return true;
     }
 
-    private static boolean attachOMERO(File file, String project, String dataset, String name) {
+    public static boolean attachOMERO(File file, String project, String dataset, String name) {
         try {
             IJ.log("Attaching to OMERO");
             OmeroConnect connect = new OmeroConnect();
