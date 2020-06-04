@@ -1,6 +1,6 @@
 --- TAPAS CORE ---
 * add folder Results in the Dataset for attached files
-* change ?name?  to ?image?
+* change ?name? to ?image?
 * create a folder tapas in plugins, mv tapas.txt there
 * use extension .tpp for tapas protocols and .tpm for tapas menus
 
