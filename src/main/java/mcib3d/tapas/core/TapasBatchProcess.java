@@ -485,8 +485,11 @@ public class TapasBatchProcess {
         File folder = new File(root + project + File.separator + datasetName);
         // all files
         if (image.equals("*")) {
-            String[] fileList = folder.list();
-            for (String file : fileList) files.add(file);
+            File[] fileList = folder.listFiles();
+            for (File file : fileList) {
+                if(file.isFile())
+                files.add(file.getName());
+            }
         }
         // list of images separated by ,
         else if (image.contains(",")) {

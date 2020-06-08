@@ -14,6 +14,19 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 public class TapasBatchUtils {
+    public static File getTapasMenuFile() {
+        // FIXME will be deprecated in 0.7, will be in tapas folder with name .tpm
+        File tapasFile = new File(IJ.getDirectory("imagej") + File.separator + "tapas.txt");
+        IJ.log("Checking tapas file " + tapasFile.getAbsolutePath());
+        if (!tapasFile.exists()) {
+            IJ.log("No tapas file found : " + tapasFile.getPath());
+            IJ.log("Cannot run TAPAS. Please check installation.");
+            return null;
+        }
+
+        return tapasFile;
+    }
+
 
     public static String analyseDirName(String s) {
         if (s == null) return s;
@@ -46,8 +59,12 @@ public class TapasBatchUtils {
             file = file.replace("?dataset?", info.getDataset());
             return analyseFileName(file, info);
         }
-        if (file.contains("?name?")) {
+        if (file.contains("?name?")) { // deprecated --> ?image?
             file = file.replace("?name?", info.getImage());
+            return analyseFileName(file, info);
+        }
+        if (file.contains("?image?")) {
+            file = file.replace("?image?", info.getImage());
             return analyseFileName(file, info);
         }
         if (file.contains("?channel?")) {
@@ -125,7 +142,7 @@ public class TapasBatchUtils {
             IJ.log("Creating folder " + attachFolder + " to store attachments");
             attachFolder.mkdir();
         }
-        path = attachFolder.getPath() + name;
+        path = attachFolder.getPath() + File.separator + name;
         try {
             IJ.log("Attaching to FILES");
             File file2 = new File(path);

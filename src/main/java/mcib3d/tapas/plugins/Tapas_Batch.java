@@ -4,6 +4,7 @@ import ij.IJ;
 import ij.Prefs;
 import ij.gui.GenericDialog;
 import ij.plugin.PlugIn;
+import mcib3d.tapas.core.TapasBatchUtils;
 import mcib3d.tapas.utils.CheckInstall;
 import mcib3d.tapas.core.TapasBatchProcess;
 
@@ -39,10 +40,9 @@ public class Tapas_Batch implements PlugIn {
         tmin = (int) Prefs.get("OMEROBATCH.tmin", 0);
         tmax = (int) Prefs.get("OMEROBATCH.tmax", 0);
 
-        File tapasFile = new File(IJ.getDirectory("imagej") + File.separator + "tapas.txt");
-        IJ.log("Checking tapas file " + tapasFile.getAbsolutePath());
-        if (!tapasFile.exists()) {
-            IJ.log("No tapas found");
+        File tapasFile = TapasBatchUtils.getTapasMenuFile();
+        if (tapasFile == null) {
+            return;
         }
 
         if (dialog()) {

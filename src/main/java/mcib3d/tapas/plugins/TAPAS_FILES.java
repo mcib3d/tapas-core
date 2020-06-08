@@ -5,6 +5,7 @@ import ij.WindowManager;
 import ij.plugin.frame.Recorder;
 import mcib3d.tapas.IJ.TapasProcessorIJ;
 import mcib3d.tapas.core.TapasBatchProcess;
+import mcib3d.tapas.core.TapasBatchUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,10 +36,10 @@ public class TAPAS_FILES extends JFrame {
     File tapasFile;
 
     public TAPAS_FILES() {
-        tapasFile = new File(IJ.getDirectory("imagej") + File.separator + "tapas.txt");
-        IJ.log("Checking tapas file " + tapasFile.getAbsolutePath());
-        if (!tapasFile.exists()) {
-            IJ.log("No tapas found");
+        // FIXME will be deprecated in 0.7, will be in tapas folder with name .tpm
+        tapasFile = TapasBatchUtils.getTapasMenuFile();
+        if (tapasFile == null) {
+            return;
         }
         listImages.setModel(model);
         //textFieldFrame.setText("0-0");
@@ -94,18 +95,6 @@ public class TAPAS_FILES extends JFrame {
             image = image.concat(model.get(indices[indices.length - 1]).toString());
         }
         String imageFinal = image;
-        // process exclude
-//        String exclude = "";
-//        ArrayList<String> excludelist = new ArrayList<>();
-//        if (exclude.equals("-")) exclude = "";// if exclude - then empty
-//        if (!exclude.isEmpty()) {
-//            String[] excludes = exclude.split(",");
-//            excludelist = new ArrayList<>(excludes.length);
-//            for (int i = 0; i < excludes.length; i++) {
-//                excludelist.add(excludes[i].trim());
-//            }
-//        }
-//       ArrayList<String> excludeFinal = excludelist;
 
         String processFile = textFieldProcess.getText();
         if (!batchProcess.init(processFile, tapasFile.getAbsolutePath())) {
@@ -206,6 +195,10 @@ public class TAPAS_FILES extends JFrame {
     private void browseRoot() {
         browseButtonRoot.setEnabled(false);
         String dir = IJ.getDirectory("Select root folder for projects");
+        if (dir == null) {
+            browseButtonRoot.setEnabled(true);
+            return;
+        }
         textFieldRoot.setText(dir);
         rootProject = dir;
         IJ.log("Found root project : " + rootProject);
@@ -228,7 +221,6 @@ public class TAPAS_FILES extends JFrame {
     }
 
     private class compareFile implements Comparator<File> {
-
         @Override
         public int compare(File o1, File o2) {
             return o1.getName().compareToIgnoreCase(o2.getName());

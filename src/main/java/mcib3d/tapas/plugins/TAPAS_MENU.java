@@ -3,6 +3,7 @@ package mcib3d.tapas.plugins;
 import ij.IJ;
 import ij.WindowManager;
 import mcib3d.tapas.core.TapasBatchProcess;
+import mcib3d.tapas.core.TapasBatchUtils;
 import mcib3d.tapas.core.TapasProcessingAbstract;
 
 import javax.swing.*;
@@ -71,11 +72,8 @@ public class TAPAS_MENU extends JFrame {
 
 
         // read list of Tapas
-        tapasFile = new File(IJ.getDirectory("imagej") + File.separator + "tapas.txt");
-        IJ.log("Checking tapas file " + tapasFile.getAbsolutePath());
-        if (!tapasFile.exists()) {
-            IJ.log("No tapas found");
-        }
+        tapasFile = TapasBatchUtils.getTapasMenuFile();
+        if (tapasFile == null) return;
         plugins = TapasBatchProcess.readPluginsFile(tapasFile.getAbsolutePath(), false);
         ArrayList<String> pluginsName = new ArrayList<>(plugins.size());
         for (String key : plugins.keySet()) {
@@ -93,7 +91,7 @@ public class TAPAS_MENU extends JFrame {
         panel1.setMinimumSize(new Dimension(800, 600));
         panel1.setPreferredSize(new Dimension(800, 600));
         setContentPane(panel1);
-        setTitle("TAPAS MENU "+TapasBatchProcess.version);
+        setTitle("TAPAS MENU " + TapasBatchProcess.version);
         pack();
         setVisible(true);
 
@@ -110,7 +108,7 @@ public class TAPAS_MENU extends JFrame {
         createTextButton.addActionListener(e -> createText());
     }
 
-    private void initText(){
+    private void initText() {
         String process = "";
         process = process.concat("// first process should be input \n");
         process = process.concat("// to read image from OMERO \n");

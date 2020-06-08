@@ -6,6 +6,7 @@ import ij.plugin.frame.Recorder;
 import mcib3d.tapas.IJ.TapasProcessorIJ;
 import mcib3d.tapas.core.TapasBatchProcess;
 import mcib3d.tapas.core.OmeroConnect;
+import mcib3d.tapas.core.TapasBatchUtils;
 import mcib3d.tapas.core.TapasProcessorAbstract;
 import mcib3d.tapas.utils.JobsGenerate;
 import omero.gateway.model.DatasetData;
@@ -57,11 +58,8 @@ public class TAPAS_OMERO extends JFrame {
     public TAPAS_OMERO() {
         // by default IJ processor
         setProcessor(new TapasProcessorIJ());
-        tapasFile = new File(IJ.getDirectory("imagej") + File.separator + "tapas.txt");
-        IJ.log("Checking tapas file " + tapasFile.getAbsolutePath());
-        if (!tapasFile.exists()) {
-            IJ.log("No tapas found");
-        }
+        tapasFile = TapasBatchUtils.getTapasMenuFile();
+        if(tapasFile == null) return;
         IJ.log("Getting list of projects and datasets from OMERO, please wait ...");
         listImages.setModel(model);
         //textFieldFrame.setText("0-0");
