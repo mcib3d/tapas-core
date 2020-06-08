@@ -1,13 +1,18 @@
 --- TAPAS CORE ---
-* add folder Results in the Dataset for attached files
-* change ?name? to ?image?
 * create a folder tapas in plugins, mv tapas.txt there
 * use extension .tpp for tapas protocols and .tpm for tapas menus
 
 --- TAPAS PLUGINS ---
-* EVF layers change parameter to fileName ? (save results and png)
-* EVF layers ask save  png then change name .csv --> .png (if no csv add .png) ?
+* change all name: by image: (deprecated in 0.7)
+* update doc
+* binaryCloseLabels, DONE, add to tapas.txt and doc
+* localThickness, DONE, add to tapas.txt and doc
 
 --- 0.6.3
+* check cancel for browse root directory in TAPAS-FILES
 * add function Attach in TAPASBatchUtils for either Files or OMERO, DONE 0.6.3
 * renamed TapasProcessor to TapasProcessorIJ
+* add folder Results in the Dataset for attached files
+* do not list folders as part as image list in TAPAS_FILES
+* change ?name? to ?image? (deprecated in 0.7)
+* EVF layers ask save  png then change name .csv --> .png (if no csv add .png) ? DONE
