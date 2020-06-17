@@ -1,12 +1,14 @@
 --- TAPAS CORE ---
-* create a folder tapas in plugins, mv tapas.txt there
-* use extension .tpp for tapas protocols and .tpm for tapas menus
+* create a folder tapas in plugins, mv tapas.txt there, 0.7
+* use extension .tpp for tapas protocols and .tpm for tapas menus, 0.7
 
 --- TAPAS PLUGINS ---
-* change all name: by image: (deprecated in 0.7)
+* EVF multi-label, 0.7
+* local thickness multi-label, 0.7
 * update doc
 * binaryCloseLabels, DONE, add to tapas.txt and doc
 * localThickness, DONE, add to tapas.txt and doc
+* change all parameters name: by image: (deprecated in 0.7), DONE, update doc
 
 --- 0.6.3
 * check cancel for browse root directory in TAPAS-FILES
