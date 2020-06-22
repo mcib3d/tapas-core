@@ -3,12 +3,9 @@
 * use extension .tpp for tapas protocols and .tpm for tapas menus, 0.7
 
 --- TAPAS PLUGINS ---
-* EVF multi-label, 0.7
+* EVF layers multi-label, exports csv for all labels, output display as pool, 0.7
 * local thickness multi-label, 0.7
-* update doc
-* binaryCloseLabels, DONE, add to tapas.txt and doc
-* localThickness, DONE, add to tapas.txt and doc
-* change all parameters name: by image: (deprecated in 0.7), DONE, update doc
+* update doc for 0.7
 
 --- 0.6.3
 * check cancel for browse root directory in TAPAS-FILES
@@ -18,3 +15,7 @@
 * do not list folders as part as image list in TAPAS_FILES
 * change ?name? to ?image? (deprecated in 0.7)
 * EVF layers ask save  png then change name .csv --> .png (if no csv add .png) ? DONE
+* binaryCloseLabels, DONE, add to tapas.txt and doc
+* localThickness, DONE, add to tapas.txt and doc
+* change all parameters name: by image: (deprecated in 0.7), DONE, update doc
+* EVF multi-label, DONE

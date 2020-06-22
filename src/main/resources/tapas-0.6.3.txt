@@ -48,6 +48,7 @@ watershed:mcib3d.tapas.IJ.plugins.segmentation.WatershedProcess
 
 // Post-Processing / Mathematical Morphology
 biggest:mcib3d.tapas.IJ.plugins.analysis.KeepBiggestProcess
+closeLabels:mcib3d.tapas.IJ.plugins.BinaryCloseLabelsProcess
 excludeEdges:mcib3d.tapas.IJ.plugins.segmentation.ExcludeObjectsEdgesProcess
 fillHoles:mcib3d.tapas.IJ.plugins.segmentation.FillHolesProcess
 filterObjects:mcib3d.tapas.IJ.plugins.analysis.FilterObjectsProcess
@@ -71,6 +72,7 @@ distancesCenter2Border:mcib3d.tapas.IJ.plugins.analysis.DistancesCenter2BorderPr
 density:mcib3d.tapas.IJ.plugins.analysis.DensityProcess
 edt_evf:mcib3d.tapas.IJ.plugins.analysis.EdtEvfProcess
 evfLayers:mcib3d.tapas.IJ.plugins.analysis.EvfLayerProcess
+localThickness:mcib3d.tapas.IJ.plugins.analysis.LocalThicknessProcess
 
 // Misc
 exe:mcib3d.tapas.IJ.plugins.misc.ExecutableProcess
