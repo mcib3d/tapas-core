@@ -1,8 +1,13 @@
 --- TAPAS CORE ---
+* input cropped image in XY from omero, using startx, starty et sizex,sizey, 0.7, DONE, TO TEST
+* input cropped image in XY from bioformats, using startx, starty et sizex,sizey, 0.7, DONE, TO TEST
+* use keyValues for FILES, see KeyValueManager, 0.7, DONE, TO TEST
 * create a folder tapas in plugins, mv tapas.txt there, 0.7
 * use extension .tpp for tapas protocols and .tpm for tapas menus, 0.7
+* remove deprecated ?name?, replaced by ?image?, 0.8
 
 --- TAPAS PLUGINS ---
+* input cropped, 0.7, OK for OMERO
 * EVF layers multi-label, exports csv for all labels, output display as pool, 0.7
 * local thickness multi-label, 0.7
 * update doc for 0.7
@@ -13,7 +18,7 @@
 * renamed TapasProcessor to TapasProcessorIJ
 * add folder Results in the Dataset for attached files
 * do not list folders as part as image list in TAPAS_FILES
-* change ?name? to ?image? (deprecated in 0.7)
+* change ?name? to ?image? (deprecated in 0.8)
 * EVF layers ask save  png then change name .csv --> .png (if no csv add .png) ? DONE
 * binaryCloseLabels, DONE, add to tapas.txt and doc
 * localThickness, DONE, add to tapas.txt and doc

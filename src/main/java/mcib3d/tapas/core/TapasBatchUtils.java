@@ -182,7 +182,9 @@ public class TapasBatchUtils {
                 users.add(st);
             }
         }
-        if (keyS.contains("KEY_")) {
+        if (!keyS.contains("KEY_")) return keyS;
+        // for OMERO
+        if (info.isOmero()) {
             try {
                 OmeroConnect connect = new OmeroConnect();
                 connect.connect();
@@ -193,6 +195,11 @@ public class TapasBatchUtils {
             } catch (Exception e) {
                 IJ.log("Pb with key " + keyS);
             }
+        }
+        // for FILES
+        else {
+            String value = KeyValueManager.getKeyValue(info,keyS);
+            if(value != null) return value;
         }
 
         return keyS;

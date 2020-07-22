@@ -9,7 +9,6 @@ public class ImageInfo {
     private String image;
     private int channel = 1; // starts at 1
     private int frame = 1; // starts at 1
-    // for files-based batch, should be "core" for core images
     private String rootDir = "OMERO"; // in case of folder, should end with File.separator character
 
     public ImageInfo() {
@@ -39,6 +38,16 @@ public class ImageInfo {
         this.channel = channel;
         this.frame = frame;
     }
+
+    public ImageInfo(String rootDir, String project, String dataset, String image) {
+        setRootDir(rootDir);
+        this.rootDir = rootDir;
+        this.project = project;
+        this.dataset = dataset;
+        this.image = image;
+    }
+
+
 
     public boolean isOmero() {
         return rootDir.equalsIgnoreCase("OMERO");

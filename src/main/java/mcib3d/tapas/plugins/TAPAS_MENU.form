@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="mcib3d.tapas.plugins.TAPAS_MENU">
-  <grid id="27dc6" binding="panel1" layout-manager="GridLayoutManager" row-count="15" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="panel1" layout-manager="GridLayoutManager" row-count="18" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="500" height="1389"/>
+      <xy x="20" y="20" width="529" height="1389"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
-      <component id="4f3ef" class="javax.swing.JLabel">
+      <component id="4f3ef" class="javax.swing.JLabel" binding="selectTapas">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
@@ -50,7 +50,7 @@
       </component>
       <component id="ca2d" class="javax.swing.JComboBox" binding="comboBoxPlugins">
         <constraints>
-          <grid row="1" column="0" row-span="10" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="1" column="0" row-span="11" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <model/>
@@ -112,14 +112,6 @@
           <text value="Parameter8"/>
         </properties>
       </component>
-      <component id="ae7de" class="javax.swing.JLabel" binding="Param9">
-        <constraints>
-          <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Parameter9"/>
-        </properties>
-      </component>
       <component id="36da3" class="javax.swing.JTextField" binding="textField3" default-binding="true">
         <constraints>
           <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
@@ -168,35 +160,9 @@
         </constraints>
         <properties/>
       </component>
-      <component id="21007" class="javax.swing.JTextField" binding="textField9" default-binding="true">
-        <constraints>
-          <grid row="9" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="-1"/>
-          </grid>
-        </constraints>
-        <properties/>
-      </component>
-      <component id="e3bde" class="javax.swing.JButton" binding="createTextButton" default-binding="true">
-        <constraints>
-          <grid row="13" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Create text"/>
-        </properties>
-      </component>
-      <component id="caa11" class="javax.swing.JTextField" binding="textFieldDescription">
-        <constraints>
-          <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="-1"/>
-          </grid>
-        </constraints>
-        <properties>
-          <editable value="false"/>
-        </properties>
-      </component>
       <scrollpane id="e9022">
         <constraints>
-          <grid row="14" column="0" row-span="1" col-span="3" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="17" column="0" row-span="1" col-span="3" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties/>
         <border type="none"/>
@@ -207,22 +173,77 @@
           </component>
         </children>
       </scrollpane>
-      <vspacer id="d0fae">
+      <component id="7715d" class="javax.swing.JButton" binding="websiteButton" default-binding="true">
         <constraints>
-          <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+          <grid row="16" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
-      </vspacer>
-      <component id="6ce66" class="javax.swing.JLabel" binding="Param10">
+        <properties>
+          <text value="Website"/>
+        </properties>
+      </component>
+      <component id="9310" class="javax.swing.JButton" binding="documentationButton" default-binding="true">
         <constraints>
-          <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="15" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Documentation"/>
+        </properties>
+      </component>
+      <component id="caa11" class="javax.swing.JTextField" binding="textFieldDescription">
+        <constraints>
+          <grid row="14" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties>
+          <editable value="false"/>
+        </properties>
+      </component>
+      <component id="e3bde" class="javax.swing.JButton" binding="createTextButton" default-binding="true">
+        <constraints>
+          <grid row="14" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Create text"/>
+        </properties>
+      </component>
+      <component id="3fcd6" class="javax.swing.JTextPane" binding="descriptionTAPAS">
+        <constraints>
+          <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="50"/>
+          </grid>
+        </constraints>
+        <properties>
+          <contentType value="text/html"/>
+        </properties>
+      </component>
+      <component id="65d05" class="javax.swing.JLabel" binding="Param9">
+        <constraints>
+          <grid row="9" column="1" row-span="2" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Parameter9"/>
+        </properties>
+      </component>
+      <component id="25a34" class="javax.swing.JLabel" binding="Param10">
+        <constraints>
+          <grid row="11" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Parameter10"/>
         </properties>
       </component>
-      <component id="79984" class="javax.swing.JTextField" binding="textField10" default-binding="true">
+      <component id="3d64b" class="javax.swing.JTextField" binding="textField9" default-binding="true">
         <constraints>
           <grid row="10" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="8bac6" class="javax.swing.JTextField" binding="textField10" default-binding="true">
+        <constraints>
+          <grid row="11" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>

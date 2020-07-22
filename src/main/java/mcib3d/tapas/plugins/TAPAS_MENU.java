@@ -2,13 +2,16 @@ package mcib3d.tapas.plugins;
 
 import ij.IJ;
 import ij.WindowManager;
+import ij.plugin.BrowserLauncher;
 import mcib3d.tapas.core.TapasBatchProcess;
 import mcib3d.tapas.core.TapasBatchUtils;
+import mcib3d.tapas.core.TapasDocumentation;
 import mcib3d.tapas.core.TapasProcessingAbstract;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,6 +42,12 @@ public class TAPAS_MENU extends JFrame {
     private JLabel Param9;
     private JLabel Param10;
     private JTextField textFieldDescription;
+    private JButton documentationButton;
+    private JButton websiteButton;
+    private JLabel selectTapas;
+    private JTextPane descriptionTAPAS;
+
+    TapasDocumentation documentation;
 
     File tapasFile;
     HashMap<String, String> plugins;
@@ -70,6 +79,9 @@ public class TAPAS_MENU extends JFrame {
         paramsText[9] = textField10;
         paramsLabel[9] = Param10;
 
+        // test
+        descriptionTAPAS.setContentType("text/html");
+        descriptionTAPAS.setText("Documentation will appear here.");
 
         // read list of Tapas
         tapasFile = TapasBatchUtils.getTapasMenuFile();
@@ -80,6 +92,10 @@ public class TAPAS_MENU extends JFrame {
             pluginsName.add(key);
         }
         Collections.sort(pluginsName);
+
+        // documentation
+        documentation = new TapasDocumentation();
+        documentation.loadDocumentation(tapasFile.getParent() + File.separator + "tapasDocumentation.txt");
 
         // fill the combo
         comboBoxPlugins.removeAllItems();
@@ -106,7 +122,26 @@ public class TAPAS_MENU extends JFrame {
 
         comboBoxPlugins.addActionListener(e -> selectPlugins());
         createTextButton.addActionListener(e -> createText());
+        documentationButton.addActionListener(e -> getDocumentation());
+        websiteButton.addActionListener(e -> launchWebsite());
     }
+
+    private void getDocumentation() {
+        try {
+            BrowserLauncher.openURL("https://www.dropbox.com/s/mzcp8lyqbsz8t73/TapasDescription0.6.3.pdf?dl=0");
+        } catch (IOException e) {
+            IJ.log("Cannot find documentation");
+        }
+    }
+
+    private void launchWebsite() {
+        try {
+            BrowserLauncher.openURL("https://imagej.net/TAPAS");
+        } catch (IOException e) {
+            IJ.log("Cannot find website");
+        }
+    }
+
 
     private void initText() {
         String process = "";
@@ -116,7 +151,6 @@ public class TAPAS_MENU extends JFrame {
         process = process.concat("process:input \n");
         textArea1.append(process);
         textArea1.append("\n");
-
     }
 
     private void createText() {
@@ -144,6 +178,10 @@ public class TAPAS_MENU extends JFrame {
             Object object = cls.newInstance();
             currentTapas = (TapasProcessingAbstract) object;
             textFieldDescription.setText(currentTapas.getName());
+            // documentation
+            String doc = documentation.getDocumentation(currentTapas.getClass().getName());
+            descriptionTAPAS.setText(doc);
+
             // parameters
             String[] parameters = currentTapas.getParameters();
             int np = parameters.length;
@@ -168,5 +206,8 @@ public class TAPAS_MENU extends JFrame {
         } catch (InstantiationException e) {
             IJ.log("Pb init " + className);
         }
+    }
+
+    private void createUIComponents() {
     }
 }

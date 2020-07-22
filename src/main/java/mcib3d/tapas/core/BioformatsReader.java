@@ -171,9 +171,32 @@ public class BioformatsReader {
         return plus;
     }
 
+    public ImagePlus getImagePlusCropping(int c, int t, int startX, int startY, int startZ, int sizeX, int sizeY, int sizeZ) {
+        ImageStack stack = readStackCropping(t, c, startX, startY, startZ, sizeX, sizeY, sizeZ);
+        if (stack == null) return null;
+        ImagePlus plus = new ImagePlus(title, stack);
+        plus.setCalibration(getCalibration());
+
+        return plus;
+    }
+
+
     private ImageStack readStack(int t, int c) {
         ImageStack imageStack = new ImageStack(sx, sy);
         for (int s = 0; s < sz; s++) {
+            ImageProcessor imageProcessor = readPlane(s, t, c);
+            if (imageProcessor == null) return null;
+            imageStack.addSlice(imageProcessor);
+        }
+
+        return imageStack;
+    }
+
+    private ImageStack readStackCropping(int t, int c, int startx, int starty, int startz, int sizex, int sizey, int sizez) {
+        ImageStack imageStack = new ImageStack(sx, sy);
+        int minZ = startz;
+        int maxZ = startz + sizez;
+        for (int s = minZ; s < maxZ; s++) {
             ImageProcessor imageProcessor = readPlane(s, t, c);
             if (imageProcessor == null) return null;
             imageStack.addSlice(imageProcessor);
@@ -211,6 +234,38 @@ public class BioformatsReader {
 
         return processor;
     }
+
+    private ImageProcessor readPlaneCropping(int z, int t, int c, int startx, int starty, int sizex, int sizey) {
+        ImageProcessor processor = null;
+        if ((z >= sz) || (c >= nbC) || (t >= nbF)) return null;
+        int idx = imageReader.getIndex(z, c, t);
+        byte[] bytes;
+        try {
+            //bytes = imageReader.openBytes(idx);
+            bytes = imageReader.openBytes(idx, startx, starty, sizex, sizey);
+            if (bits == 16) {
+                short[] shorts = convertShort(bytes, endian);
+                processor = new ShortProcessor(sx, sy, shorts, null);
+            } else if (bits == 8) {
+                byte[] byt = convertByte(bytes);
+                processor = new ByteProcessor(sx, sy, byt, null);
+            } else if (bits == 32) { // not working
+                float[] floats = convertFloat(bytes);
+                processor = new FloatProcessor(sx, sy, floats, null);
+            }
+        } catch (FormatException e) {
+            IJ.log(e.getMessage());
+            e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            IJ.log(e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+
+        return processor;
+    }
+
 
     // FIXME
     private float[] convertFloat(byte[] bytes) {
