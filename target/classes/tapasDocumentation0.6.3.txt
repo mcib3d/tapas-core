@@ -1,0 +1,51 @@
+// Version 0.6.3
+
+// Main Input/Output
+category:Main Input/Output
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.InputProcess
+Main <b>input</b> module for data, either from OMERO or local DB.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.OutputProcess 
+Main <b>output</b> module for data, either from OMERO or local DB.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.AttachProcess
+Attach a file to an image data (in Omero or Local DB).
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.AttachListProcess
+Attach a <i>list</b> file to an image data (in Omero or Local DB).
+
+// Additional Input/Output
+category:Additional Input/Output
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.DeleteProcess
+Delete a temporary file.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.DeleteListProcess
+Delete a <i>list</i> of temporary files.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.InputProcessBinning
+Input a binned version of data (reduce memory).
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.LoadProcess
+Load a <b>temporary</b> saved image file.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.LoadOmeroProcess
+Download hyperstack image data from OMERO (use <b>input</b> for normal processing).
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.MergeChannelsProcess
+Merge image files into a RGB or composite image.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.NoInputProcess
+To use only when no input data is required (to use with <b>subProcess</b>).
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.SaveProcess
+Save image data to a <b>temporary</b> file.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.SequenceProcess
+Open a stack as a sequence of 2D images, use Z for 3D stack data or Z for temporal data.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.TestInputProcess
+Create a 2D or 3D test data.
+
+

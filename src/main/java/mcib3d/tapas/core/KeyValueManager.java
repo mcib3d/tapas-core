@@ -6,26 +6,26 @@ import java.io.*;
 import java.util.HashMap;
 
 public class KeyValueManager {
-    private static HashMap<String, KeyValues> keys = new HashMap<>();
-    private static final String DIRKEY = "keyValuePairs";
+    private static final HashMap<String, KeyValues> keys = new HashMap<>();
+    private static final String DIR_KEY = "keyValuePairs";
 
     public static String getKeyValue(ImageInfo info, String key) {
-        if (!keys.keySet().contains(key)) {
-            File file = new File(info.getDatasetPath() + DIRKEY + File.separator + "KEY_" + key + ".txt");
+        if (keys.containsKey(key)) {
+            return keys.get(key).getValue(info);
+        } else {
+            File file = new File(info.getDatasetPath() + DIR_KEY + File.separator + "KEY_" + key + ".txt");
             readKeyValues(info, file, key, true);
-        }
 
+        }
         return keys.get(key).getValue(info);
     }
 
     public static void addKeyValue(ImageInfo info, String key, String value) {
-        if (keys.keySet().contains(key)) {
-            keys.get(key).addKeyValue(info, value);
-        } else {
+        if (!keys.containsKey(key)) {
             KeyValues keyValue = new KeyValues(key);
             keys.put(key, keyValue);
-            keys.get(key).addKeyValue(info, value);
         }
+        keys.get(key).addKeyValue(info, value);
     }
 
     public static void readKeyValues(ImageInfo info, File file, String key, boolean verbose) {
@@ -41,7 +41,7 @@ public class KeyValueManager {
                 c++;
                 int idx = line.indexOf("//");
                 if ((idx < 0) && (!line.isEmpty())) { // strange error on linux ??
-                    String data[] = line.split(":");
+                    String[] data = line.split(":");
                     if (data.length != 2) {
                         IJ.log("Pb for key with line " + c + ":" + line + " ");
                     }
@@ -52,8 +52,6 @@ public class KeyValueManager {
                 }
                 line = reader.readLine();
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

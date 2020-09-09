@@ -165,6 +165,9 @@ public class TAPAS_MENU extends JFrame {
         }
         textArea1.append(process);
         textArea1.append("\n");
+
+        // TEST
+        documentation.printCategories();
     }
 
     private void selectPlugins() {

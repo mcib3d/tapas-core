@@ -1,0 +1,86 @@
+// Main Input/Output
+input:mcib3d.tapas.IJ.plugins.inputOutput.InputProcess
+output:mcib3d.tapas.IJ.plugins.inputOutput.OutputProcess
+
+// Additional Input/Output
+attach:mcib3d.tapas.IJ.plugins.inputOutput.AttachProcess
+attachList:mcib3d.tapas.IJ.plugins.inputOutput.AttachListProcess
+delete:mcib3d.tapas.IJ.plugins.inputOutput.DeleteProcess
+deleteList:mcib3d.tapas.IJ.plugins.inputOutput.DeleteListProcess
+inputBinning:mcib3d.tapas.IJ.plugins.inputOutput.InputProcessBinning
+load:mcib3d.tapas.IJ.plugins.inputOutput.LoadProcess
+loadOMERO:mcib3d.tapas.IJ.plugins.inputOutput.LoadOmeroProcess
+mergeChannels:mcib3d.tapas.IJ.plugins.inputOutput.MergeChannelsProcess
+noInput:mcib3d.tapas.IJ.plugins.inputOutput.NoInputProcess
+save:mcib3d.tapas.IJ.plugins.inputOutput.SaveProcess
+sequence:mcib3d.tapas.IJ.plugins.inputOutput.SequenceProcess
+test:mcib3d.tapas.IJ.plugins.inputOutput.TestInputProcess
+
+// Calibration
+calibrationLoadAndApply:mcib3d.tapas.IJ.plugins.inputOutput.LoadScaleProcess
+calibrationSave:mcib3d.tapas.IJ.plugins.inputOutput.SaveScaleProcess
+calibrationSet:mcib3d.tapas.IJ.plugins.inputOutput.SetScaleProcess
+
+// Processing
+crop:mcib3d.tapas.IJ.plugins.processing.CropProcess
+cropZ:mcib3d.tapas.IJ.plugins.processing.CropZProcess
+invert:mcib3d.tapas.IJ.plugins.processing.InvertGrayProcess
+math:mcib3d.tapas.IJ.plugins.processing.ArithmeticProcess
+normalise:mcib3d.tapas.IJ.plugins.processing.NormaliseValuesProcess
+project:mcib3d.tapas.IJ.plugins.processing.ProjectionProcess
+scale:mcib3d.tapas.IJ.plugins.processing.ScaleProcess
+
+// Filtering
+filters:mcib3d.tapas.IJ.plugins.processing.FastFilters3DProcess
+filtersCLIJ:mcib3d.tapas.IJ.plugins.processing.CLIJProcess
+rollingBall:mcib3d.tapas.IJ.plugins.processing.RollingBallProcess
+
+// Threshold
+autoThreshold:mcib3d.tapas.IJ.plugins.segmentation.AutoThresholderProcess
+threshold:mcib3d.tapas.IJ.plugins.segmentation.ThresholderProcess
+percentileThreshold:mcib3d.tapas.IJ.plugins.segmentation.ThresholdPercentileProcess
+
+// Threshold / Segment
+hysteresis:mcib3d.tapas.IJ.plugins.segmentation.HysteresisProcess
+iterative:mcib3d.tapas.IJ.plugins.segmentation.IterativeThresholdingProcess
+label:mcib3d.tapas.IJ.plugins.segmentation.LabellerProcess
+watershed:mcib3d.tapas.IJ.plugins.segmentation.WatershedProcess
+
+// Post-Processing / Mathematical Morphology
+biggest:mcib3d.tapas.IJ.plugins.analysis.KeepBiggestProcess
+closeLabels:mcib3d.tapas.IJ.plugins.BinaryCloseLabelsProcess
+excludeEdges:mcib3d.tapas.IJ.plugins.segmentation.ExcludeObjectsEdgesProcess
+fillHoles:mcib3d.tapas.IJ.plugins.segmentation.FillHolesProcess
+filterObjects:mcib3d.tapas.IJ.plugins.analysis.FilterObjectsProcess
+separate2D:mcib3d.tapas.IJ.plugins.segmentation.WatershedIJProcess
+
+// Analysis / Measurement
+analyzeParticles:mcib3d.tapas.IJ.plugins.analysis.AnalyzeParticlesProcess
+measurement:mcib3d.tapas.IJ.plugins.analysis.MeasurementProcess
+multiColoc:mcib3d.tapas.IJ.plugins.analysis.MultiColocProcess
+number:mcib3d.tapas.IJ.plugins.analysis.NumberingProcess
+quantif:mcib3d.tapas.IJ.plugins.analysis.QuantificationProcess
+
+// Analysis / Distances
+distancesBorder:mcib3d.tapas.IJ.plugins.analysis.DistancesBorderProcess
+distancesBorder2:mcib3d.tapas.IJ.plugins.analysis.DistancesBorder2Process
+distancesCenter:mcib3d.tapas.IJ.plugins.analysis.DistancesCenterProcess
+distancesCenter2:mcib3d.tapas.IJ.plugins.analysis.DistancesCenter2Process
+distancesCenter2Border:mcib3d.tapas.IJ.plugins.analysis.DistancesCenter2BorderProcess
+
+// Analysis / Other
+density:mcib3d.tapas.IJ.plugins.analysis.DensityProcess
+edt_evf:mcib3d.tapas.IJ.plugins.analysis.EdtEvfProcess
+evfLayers:mcib3d.tapas.IJ.plugins.analysis.EvfLayerProcess
+localThickness:mcib3d.tapas.IJ.plugins.analysis.LocalThicknessProcess
+
+// Misc
+exe:mcib3d.tapas.IJ.plugins.misc.ExecutableProcess
+macro:mcib3d.tapas.IJ.plugins.misc.MacroProcess
+show:mcib3d.tapas.IJ.plugins.misc.ShowProcess
+sleep:mcib3d.tapas.IJ.plugins.misc.SleepProcess
+subProcess:mcib3d.tapas.IJ.plugins.misc.SubProcess
+
+// Utilities
+appendResults:mcib3d.tapas.IJ.plugins.utils.AppendResultsProcess
+mergeResults:mcib3d.tapas.IJ.plugins.utils.MergeResultsProcess
