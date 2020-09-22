@@ -1,0 +1,215 @@
+// Version 0.6.3
+
+// Main Input/Output
+category:Main Input/Output
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.InputProcess
+Main <b>input</b> module for data, either from OMERO or local DB.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.OutputProcess 
+Main <b>output</b> module for data, either from OMERO or local DB.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.AttachProcess
+Attach a file to an image data (in Omero or Local DB).
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.AttachListProcess
+Attach a <i>list</i> of files to an image data (in Omero or Local DB).
+
+// Additional Input/Output
+category:Additional Input/Output
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.DeleteProcess
+Delete a temporary file.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.DeleteListProcess
+Delete a <i>list</i> of temporary files.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.InputProcessBinning
+Input a binned version of data (reduce memory).
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.LoadProcess
+Load a <b>temporary</b> saved image file.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.LoadOmeroProcess
+Download hyperstack image data from OMERO (use <b>input</b> for normal processing).
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.MergeChannelsProcess
+Merge image files into a RGB or composite image.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.NoInputProcess
+To use only when no input data is required (to use with <b>subProcess</b>).
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.SaveProcess
+Save image data to a <b>temporary</b> file.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.SequenceProcess
+Open a stack as a sequence of 2D images, use Z for 3D stack data or Z for temporal data.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.TestInputProcess
+Create a 2D or 3D test data.
+
+// Calibration
+category:Calibration
+class:mcib3d.tapas.IJ.plugins.inputOutput.LoadScaleProcess
+will load a saved calibration and apply it to an image (the current one by default), will also update calibration on OMERO.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.SaveScaleProcess
+Saves the calibration of the current image into a file.
+
+class:mcib3d.tapas.IJ.plugins.inputOutput.SetScaleProcess
+Will set the calibration to the current image. 
+
+// Processing
+category:processing
+class:mcib3d.tapas.IJ.plugins.processing.CropProcess
+Crops the image using a saved Roi (ImageJ format).
+
+class:mcib3d.tapas.IJ.plugins.processing.CropZProcess
+Crops the image in the Z dimension, slice numbering starts at 0. 
+
+class:mcib3d.tapas.IJ.plugins.processing.InvertGrayProcess
+Invert gray values.
+
+class:mcib3d.tapas.IJ.plugins.processing.ArithmeticProcess
+Arithmetic operation between current image and temporary saved image. The available operations are : <b>add</b>, <b>mult</b>, <b>max</b>, <b>min</b> and <b>diff</b>.
+A <i>subtraction</i> will be performed with add and coefficient -1. <b>coef0</b> refers to current image and <b>coef1</b> to saved image.
+
+class:mcib3d.tapas.IJ.plugins.processing.NormaliseValuesProcess
+Normalises intensity values with given mean and standard deviation.
+
+class:mcib3d.tapas.IJ.plugins.processing.ProjectionProcess
+Projection in Z of a 3D image, will perfor maximum Projection.
+
+class:mcib3d.tapas.IJ.plugins.processing.ScaleProcess
+Performs scaling of an image, <b>normalise</b> (set to <b>yes</b>) will create <i>isotropic</i> image (same <i>Z</i> calibration as <i>XY</i>). 
+
+// Filtering
+category:filtering
+class:mcib3d.tapas.IJ.plugins.processing.FastFilters3DProcess
+Filters the current image (2D and 3D version), available filters are : <b>median</b>, <b>mean</b>, <b>tophat</b>, <b>open</b>, <b>close</b>, <b>min</b> and <b>max</b>.
+
+class:mcib3d.tapas.IJ.plugins.processing.CLIJProcess
+Filters the current image (2D and 3D version) using <b>CLIJ</b>, available filters are : <b>median</b>, <b>mean</b>, <b>tophat</b>, <b>open</b>, <b>close</b>, <b>min</b> and <b>max</b>.
+
+class:mcib3d.tapas.IJ.plugins.processing.RollingBallProcess
+Applies the rolling ball algorithm from ImageJ (only 2D).
+
+// Threshold
+category:thresholding
+class:mcib3d.tapas.IJ.plugins.segmentation.AutoThresholderProcess
+Threshold the current image using automatic threshold, available methods are : <b>Isodata</b>, <b>Otsu</b>, <b>Intermodes</b>, <b>Yen</b>, <b>Triangle</b>, <b>Mean</b>, <b>Huang</b> and <b>IJ_Isodata</b>. The image is supposed to have a <b>dark</b> background by default, set it to <b>no</b> for light background.
+
+class:mcib3d.tapas.IJ.plugins.segmentation.ThresholderProcess
+Applies global thresholding to the current image (creates a binary image).
+
+class:mcib3d.tapas.IJ.plugins.segmentation.ThresholdPercentileProcess
+Performs thresholding based on the percentage of brightest pixels, the percentile value is between 0 and 1 (for instance 0.05 will compute the threshold for 95% of the pixels, i.e 5% of the brightest pixels).
+
+// Threshold / Segment
+category:segmentation
+class:mcib3d.tapas.IJ.plugins.segmentation.HysteresisProcess
+Performs a <b>hysteresis</b> threshloding. Keep objects thresholded with low threshold but containing values with high threshold. Will perform labeling if parameter <b>labeling</b> is set to <b>yes</b>, else will create a binary image.
+
+class:mcib3d.tapas.IJ.plugins.segmentation.IterativeThresholdingProcess
+Most compact objects will be detected after testing all thresholds above specified minimum threshold. Only objects within volume (in voxels) range will be detected (set maximum volume to -1 to specify no maximam value). 
+
+class:mcib3d.tapas.IJ.plugins.segmentation.LabellerProcess
+Labels a binary image and detect individuals objects within volume range (set maximum volume to -1 to specify no maximam value). Volumes are specified in voxels by default, set unit to yes to specify volumes in unit. 
+
+class:mcib3d.tapas.IJ.plugins.segmentation.WatershedProcess
+Performs watershed segmentation after computing local maxima and use them as seeds. 
+
+// Post-Processing / Mathematical Morphology
+category:post-processing
+class:mcib3d.tapas.IJ.plugins.analysis.KeepBiggestProcess
+Keeps only the biggest object from the labelled image.
+
+class:mcib3d.tapas.IJ.plugins.BinaryCloseLabelsProcess
+Performs closing operation on labelled objects.
+
+class:mcib3d.tapas.IJ.plugins.segmentation.ExcludeObjectsEdgesProcess
+Excludes labeled objects touching edges in <i>XY</i>, set parameter excludeZ to yes to exclude objects touching Z edges.
+
+class:mcib3d.tapas.IJ.plugins.segmentation.FillHolesProcess
+Fills holes in images using ImageJ algorithm (2D), on binary image.
+
+class:mcib3d.tapas.IJ.plugins.analysis.FilterObjectsProcess
+Filters objects in a labelled image based on a descriptor (volume, compactness, elongation, compactnessDiscrete). Objects whose descriptor value is within range will be kept. 
+
+class:mcib3d.tapas.IJ.plugins.segmentation.WatershedIJProcess
+Performs ImageJ binary watershed (to separate touching objects).
+
+// Analysis / Measurement
+category:measurement
+class:mcib3d.tapas.IJ.plugins.analysis.AnalyzeParticlesProcess
+Performs the <b>analyzeParticles</b> function from ImageJ (2D labelling + measurements). The list of measurements include area and perimeter by default, additional measurements are centroid, ellipse, shape and feret.
+
+class:mcib3d.tapas.IJ.plugins.analysis.MeasurementProcess
+Performs 3D measurement on a labelled image. Available measurements, for the <i>list</i> parameter, are : volume, area, centroid, compactness, ellipsoid and DC (Distances to Center).
+
+class:mcib3d.tapas.IJ.plugins.analysis.MultiColocProcess
+Will quantify colocalisation between objects from the current labelled image and a temporary saved labelled image. 
+
+class:mcib3d.tapas.IJ.plugins.analysis.NumberingProcess
+Will quantify the number of objects inside other objects using another temporary saved labelled image. Results will be the volume occupied by the objects and the number of objects within the objects of the current image.
+
+class:mcib3d.tapas.IJ.plugins.analysis.QuantificationProcess
+Will perform signal quantification on the current labelled image, signal to quantify will be in a temporary saved image.
+
+// Analysis / Distances
+category:distances
+class:mcib3d.tapas.IJ.plugins.analysis.DistancesBorderProcess
+Will compute distances border to border for all pairs of objects within the image.
+
+class:mcib3d.tapas.IJ.plugins.analysis.DistancesBorder2Process
+Will compute distances border to border for all pairs of objects from the current labelled image to objects in a temporary saved image.
+
+class:mcib3d.tapas.IJ.plugins.analysis.DistancesCenterProcess
+Will compute distances center to center for all pairs of objects within the image.
+
+class:mcib3d.tapas.IJ.plugins.analysis.DistancesCenter2Process
+Will compute distances center to center for all pairs of objects from the current labelled image to objects in a temporary saved image.
+
+class:mcib3d.tapas.IJ.plugins.analysis.DistancesCenter2BorderProcess
+Will compute distances center to border for all pairs of objects from the current labelled image to objects in a temporary saved image.
+
+// Analysis / Other
+category:analysis
+class:mcib3d.tapas.IJ.plugins.analysis.DensityProcess
+Compute the density map of objects using neighbouring distance analysis. The parameter <b>neighbours</b> refer to the number of neighbours to use for computation. The <b>radius</b> parameter controls the extension from each object.
+
+class:mcib3d.tapas.IJ.plugins.analysis.EdtEvfProcess
+Will compute either the euclidean distance transform (EDT) or the eroded volume fraction (EVF, normalised EVF). Will compute EDT
+by default. Set the parameter <b>evf</b> to <b>yes</b> to compute EVF, in cases the image contain multiple label objects, the EVF will be normalised for each object.
+
+class:mcib3d.tapas.IJ.plugins.analysis.EvfLayerProcess
+Will compute objects distribution within evf layers (layers with equal volumes). The EVF image should be saved as a temporaty image. A <i>csv</i> file along with a
+png image file will be output. The <i>-all</i> files will serve as control and contains all evf values within the different layers.
+
+class:mcib3d.tapas.IJ.plugins.analysis.LocalThicknessProcess
+Computes the calibrated local thickness (based on ImageJ localThickness plugin).
+
+// Misc
+category:misc.
+class:mcib3d.tapas.IJ.plugins.misc.ExecutableProcess
+Will executes a external program.
+
+class:mcib3d.tapas.IJ.plugins.misc.MacroProcess
+Will run an ImageJ macro. The current image is passed to the macro. The final image of the macro is passed to TAPAS.
+
+class:mcib3d.tapas.IJ.plugins.misc.ShowProcess
+Will display the current image. 
+
+class:mcib3d.tapas.IJ.plugins.misc.SleepProcess
+Will pause the TAPAS protocol, time is in seconds.
+
+class:mcib3d.tapas.IJ.plugins.misc.SubProcess
+Will execute a saved protocol, the module noInput can be used in this case before calling subProcess.
+
+// Utilities
+category:utils
+class:mcib3d.tapas.IJ.plugins.utils.AppendResultsProcess
+Will append a result table, saved as file, to another one.
+
+class:mcib3d.tapas.IJ.plugins.utils.MergeResultsProcess
+Will merge two or more results tables.
