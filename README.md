@@ -1,3 +1,6 @@
+## NEW REPOSITORY
+https://framagit.org/mcib3d/tapas-core
+
 # tapas-core
 The tapas-core library is the core for the core functionnalities and plugins of TAPAS, a system for automation for processing and analysis with ImageJ and OMERO. It can also work with local files if Omero is not isntalled.
 
